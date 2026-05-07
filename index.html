@@ -248,9 +248,13 @@
       width:175px;
       opacity:0;
       pointer-events:none;
-      /* only animate opacity — transform is handled entirely by gyro JS */
       transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
       will-change: transform, opacity;
+      /* prevent GPU layer doubling/glitch */
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translate3d(0,0,0);
+      -webkit-transform: translate3d(0,0,0);
     }
     .panel.on { pointer-events:auto; }
 
@@ -267,6 +271,8 @@
       position:relative;
       border:1px solid rgba(107,127,212,.5);
       border-top:2px solid var(--blue);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     /* corner marks */
     .c { position:absolute; width:9px; height:9px; }
@@ -707,45 +713,54 @@ function applyGyro(g, b){
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el) return;
-    /* fast smooth gyro response */
-    el.style.transition = 'opacity 1.2s ease, transform 0.25s ease-out';
-    el.style.transform = `translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
+    const tx = (ax+gF*0.7)*W*0.5;
+    const ty = (ay+bF*0.7)*H*0.5;
+    /* translate3d forces GPU compositing — prevents glitch/doubling */
+    el.style.transform = `translate3d(${tx}px,${ty}px,0)`;
   });
 }
 
 function initGyro(){
-  /* immediately position all panels off-screen based on their anchors */
   const W=window.innerWidth, H=window.innerHeight;
+
+  /* pre-position all panels off-screen instantly (no transition) */
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el) return;
-    el.style.transition = 'none'; /* instant — no animation on initial position */
-    el.style.transform = `translate(${ax*W*0.5}px,${ay*H*0.5}px)`;
+    el.style.transition = 'none';
+    el.style.transform = `translate3d(${ax*W*0.5}px,${ay*H*0.5}px,0)`;
+  });
+
+  /* re-enable transition after a frame so subsequent moves are smooth */
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      Object.keys(ANCHORS).forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.transition = 'opacity 1.2s ease';
+        /* note: transform transition intentionally removed —
+           gyro updates every frame so transition on transform causes lag */
+      });
+    });
   });
 
   let hasGyro=false;
-  /* small delay before listening so initial position is set */
+  window.addEventListener('deviceorientation', e=>{
+    if(e.gamma===null && e.beta===null) return;
+    hasGyro=true;
+    sG += (e.gamma-sG)*0.12;
+    sB += (e.beta-sB)*0.12;
+    applyGyro(sG, sB);
+  });
+
+  /* fallback: no gyro detected → centre all panels */
   setTimeout(()=>{
-    window.addEventListener('deviceorientation', e=>{
-      if(e.gamma===null && e.beta===null) return;
-      hasGyro=true;
-      sG += (e.gamma-sG)*0.1;
-      sB += (e.beta-sB)*0.1;
-      applyGyro(sG, sB);
-    });
-    setTimeout(()=>{
-      if(!hasGyro){
-        /* no gyro — show all panels centred */
-        Object.entries(ANCHORS).forEach(([id])=>{
-          const el=document.getElementById(id);
-          if(el){
-            el.style.transition = 'opacity 1.2s ease, transform 0.8s ease';
-            el.style.transform='translate(0,0)';
-          }
-        });
-      }
-    }, 2500);
-  }, 100);
+    if(!hasGyro){
+      Object.keys(ANCHORS).forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.transform='translate3d(0,0,0)';
+      });
+    }
+  }, 2500);
 }
 
 /* ══════════════════════════════
@@ -795,17 +810,16 @@ document.getElementById('btn').addEventListener('click', function(){
     /* Init gyro FIRST — pre-positions panels off-screen via transform */
     initGyro();
 
-    /* Small delay then reveal panels one by one via CSS stagger */
+    /* Small delay then reveal panels one by one via JS stagger */
     setTimeout(()=>{
-      document.querySelectorAll('.panel').forEach(p => {
-        p.style.opacity = '1';
-      });
-      /* stagger opacity manually */
       const panels = ['pa','pr','pv','pq','pc'];
       panels.forEach((id, i) => {
         setTimeout(()=>{
           const el = document.getElementById(id);
-          if(el) el.classList.add('on');
+          if(el){
+            el.classList.add('on');
+            el.style.opacity = '1';
+          }
         }, i * 400);
       });
     }, 300);
