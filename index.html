@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Abbyan & Nabila — Wedding Invitation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Cinzel+Decorative:wght@400;700&family=Jost:wght@200;300;400&display=swap');
+
+    :root {
+      --red: #c0251a;
+      --red-bright: #e8332a;
+      --red-deep: #8a1510;
+      --red-light: #e87060;
+      --cream: #f2e8d9;
+      --cream-dark: #d9c9b0;
+      --dark: #0f0808;
+      --dark2: #1a0c0c;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Jost', sans-serif; background: var(--dark); color: var(--cream); height: 100dvh; overflow: hidden; }
+
+    /* ── LANDING ── */
+    #landing {
+      position: fixed; inset: 0; z-index: 200;
+      background: radial-gradient(ellipse at 20% 10%, #2a0a0a 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 90%, #1a0505 0%, transparent 55%), #0f0808;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2.5rem 2rem;
+      transition: opacity 1s ease, visibility 1s;
+    }
+    #landing.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #landing::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.5; pointer-events: none;
+    }
+
+    .top-label {
+      font-family: 'Cinzel Decorative', serif; font-size: 0.5rem;
+      letter-spacing: 0.5em; text-transform: uppercase;
+      color: var(--red-light); opacity: 0.75; margin-bottom: 1.2rem;
+      animation: fadeUp 1.2s ease both;
+    }
+    .ornament-line {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--red), transparent);
+      margin: 0.6rem auto; animation: fadeUp 1.2s ease 0.15s both;
+    }
+
+    .couple-photos {
+      display: flex; gap: 1.2rem; justify-content: center;
+      align-items: center; margin: 0.8rem 0;
+      animation: fadeUp 1.2s ease 0.3s both;
+    }
+    .photo-frame { position: relative; width: 88px; height: 112px; }
+    .photo-frame img {
+      width: 100%; height: 100%; object-fit: cover; object-position: top;
+      border-radius: 50% / 45%; filter: grayscale(100%) contrast(1.08);
+      display: block;
+    }
+    .photo-frame::before {
+      content: ''; position: absolute; inset: -4px;
+      border-radius: 50% / 45%;
+      background: conic-gradient(var(--red), var(--red-deep), var(--red-light), var(--red-deep), var(--red));
+      z-index: -1;
+    }
+    .photo-frame::after {
+      content: ''; position: absolute; inset: -9px;
+      border-radius: 50% / 45%;
+      border: 1px solid rgba(192,37,26,0.2); z-index: -2;
+    }
+    .amp { font-family: 'Bodoni Moda', serif; font-size: 2rem; color: var(--red); font-style: italic; opacity: 0.85; }
+
+    .couple-names {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(1.5rem, 6.5vw, 2.2rem); font-weight: 900;
+      line-height: 1.1; animation: fadeUp 1.2s ease 0.4s both;
+    }
+    .name-red {
+      background: linear-gradient(90deg, var(--red-deep), var(--red-light), var(--red-bright), var(--red-light), var(--red-deep));
+      background-size: 200% auto; -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+      animation: shimmer 3s linear infinite, fadeUp 1.2s ease 0.4s both;
+      font-style: italic;
+    }
+    .and-line {
+      display: block; font-size: 0.5em; color: var(--red-light);
+      letter-spacing: 0.4em; font-style: normal;
+      font-family: 'Cinzel Decorative', serif; font-weight: 400; margin: 0.3em 0;
+      -webkit-text-fill-color: var(--red-light);
+    }
+    .wedding-date {
+      font-family: 'Cinzel Decorative', serif; font-size: 0.52rem;
+      letter-spacing: 0.25em; color: var(--cream-dark); opacity: 0.65;
+      margin-top: 1rem; animation: fadeUp 1.2s ease 0.5s both;
+    }
+    .quran-quote {
+      font-family: 'Bodoni Moda', serif; font-style: italic;
+      font-size: 0.75rem; color: var(--cream); opacity: 0.45;
+      max-width: 250px; line-height: 1.9; margin-top: 1.2rem;
+      animation: fadeUp 1.2s ease 0.6s both;
+    }
+    .ar-instruction {
+      margin-top: 1.5rem; font-size: 0.65rem; letter-spacing: 0.12em;
+      color: var(--cream); opacity: 0.35; line-height: 2;
+      animation: fadeUp 1.2s ease 0.7s both;
+    }
+    #start-btn {
+      margin-top: 1.4rem; background: transparent;
+      border: 1px solid var(--red); color: var(--red);
+      font-family: 'Cinzel Decorative', serif; font-size: 0.52rem;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      padding: 0.9rem 2.5rem; cursor: pointer;
+      position: relative; overflow: hidden; transition: color 0.4s;
+      animation: fadeUp 1.2s ease 0.8s both;
+    }
+    #start-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--red); transform: scaleX(0);
+      transform-origin: left; transition: transform 0.4s ease; z-index: -1;
+    }
+    #start-btn:hover::before { transform: scaleX(1); }
+    #start-btn:hover { color: var(--cream); }
+
+    /* ── PERMISSION ── */
+    #permission-screen {
+      position: fixed; inset: 0; z-index: 190;
+      background: rgba(8,2,2,0.97);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+    }
+    #permission-screen.active { display: flex; }
+    #permission-screen .perm-icon { font-size: 3rem; margin-bottom: 1.5rem; }
+    #permission-screen h2 {
+      font-family: 'Bodoni Moda', serif; font-size: 1.5rem;
+      font-weight: 400; font-style: italic; color: var(--red); margin-bottom: 0.8rem;
+    }
+    #permission-screen p { font-weight: 300; font-size: 0.8rem; line-height: 2; opacity: 0.6; max-width: 260px; }
+    #allow-btn {
+      margin-top: 2rem; background: var(--red); border: none; color: var(--cream);
+      font-family: 'Cinzel Decorative', serif; font-size: 0.52rem; letter-spacing: 0.35em;
+      text-transform: uppercase; padding: 1rem 2.5rem; cursor: pointer;
+    }
+
+    /* ── AR OVERLAY ── */
+    #ar-overlay {
+      position: fixed; inset: 0; z-index: 50;
+      pointer-events: none; display: none;
+    }
+    #ar-overlay.active { display: block; }
+
+    .overlay-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 2rem 1.5rem 3rem;
+      background: linear-gradient(to bottom, rgba(8,2,2,0.9) 0%, transparent 100%);
+      text-align: center;
+    }
+    .guide-title { font-family: 'Cinzel Decorative', serif; font-size: 0.52rem; letter-spacing: 0.4em; color: var(--red-light); text-transform: uppercase; }
+    .guide-sub { font-size: 0.72rem; font-weight: 300; color: var(--cream); opacity: 0.5; margin-top: 0.35rem; letter-spacing: 0.08em; }
+
+    /* Music toggle */
+    #music-toggle {
+      position: fixed; top: 1.2rem; right: 1.2rem; z-index: 100;
+      background: rgba(10,3,3,0.75); border: 1px solid rgba(192,37,26,0.4);
+      color: var(--red-light); width: 38px; height: 38px;
+      border-radius: 50%; cursor: pointer; font-size: 1rem;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); transition: all 0.3s;
+    }
+    #music-toggle.visible { display: flex; }
+    #music-toggle:hover { background: rgba(192,37,26,0.25); border-color: var(--red); }
+    #music-toggle.muted { opacity: 0.45; }
+
+    .overlay-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 3rem 1rem 2.2rem;
+      background: linear-gradient(to top, rgba(8,2,2,0.9) 0%, transparent 100%);
+      text-align: center;
+    }
+    .compass { display: flex; gap: 0.5rem; justify-content: center; align-items: center; pointer-events: all; }
+    .compass-btn {
+      background: rgba(192,37,26,0.1);
+      border: 1px solid rgba(192,37,26,0.35);
+      color: var(--red-light); font-family: 'Cinzel Decorative', serif;
+      font-size: 0.38rem; letter-spacing: 0.1em;
+      padding: 0.55rem 0.6rem; cursor: pointer;
+      transition: all 0.3s; display: flex;
+      flex-direction: column; align-items: center; gap: 0.25rem;
+    }
+    .compass-btn span { font-size: 1.1rem; }
+    .compass-btn.active, .compass-btn:hover { background: rgba(192,37,26,0.3); border-color: var(--red); color: var(--cream); }
+
+    /* ── TILT GUIDE ── */
+    #tilt-guide {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 55; text-align: center;
+      pointer-events: none; transition: opacity 0.6s;
+    }
+    #tilt-guide.hidden { opacity: 0; }
+    .tilt-arrow { font-size: 2.5rem; color: var(--red); animation: bounce 1.2s ease infinite; }
+    .tilt-text { font-family: 'Cinzel Decorative', serif; font-size: 0.48rem; letter-spacing: 0.35em; color: var(--red-light); text-transform: uppercase; margin-top: 0.4rem; opacity: 0.85; }
+
+    /* ── INFO PANELS ── */
+    .info-panel {
+      position: fixed; z-index: 60; width: 185px;
+      opacity: 0; transform: scale(0.85) translateY(18px);
+      transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: none;
+    }
+    .info-panel.visible { opacity: 1; transform: scale(1) translateY(0); }
+
+    #panel-akad    { top: 14%; left: 4%; }
+    #panel-resepsi { top: 14%; right: 4%; }
+    #panel-venue   { top: 46%; left: 50%; transform: translateX(-50%) scale(0.85) translateY(18px); }
+    #panel-venue.visible { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+    #panel-countdown { bottom: 24%; left: 4%; }
+    #panel-quran   { bottom: 24%; right: 4%; }
+
+    .panel-inner {
+      background: rgba(10,3,3,0.93); border: 1px solid rgba(192,37,26,0.4);
+      padding: 1.1rem 0.9rem; position: relative; overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    .panel-inner::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(to right, transparent, var(--red), transparent);
+    }
+    .panel-tag { font-family: 'Cinzel Decorative', serif; font-size: 0.38rem; letter-spacing: 0.4em; color: var(--red-light); text-transform: uppercase; margin-bottom: 0.5rem; opacity: 0.85; }
+    .panel-title { font-family: 'Bodoni Moda', serif; font-size: 0.95rem; font-style: italic; color: var(--cream); margin-bottom: 0.45rem; }
+    .panel-body { font-size: 0.68rem; font-weight: 300; line-height: 1.85; color: var(--cream); opacity: 0.75; }
+    .panel-body strong { color: var(--red-light); font-weight: 400; }
+
+    .corner { position: absolute; width: 10px; height: 10px; }
+    .c-tl { top: 4px; left: 4px; border-top: 1px solid var(--red); border-left: 1px solid var(--red); }
+    .c-tr { top: 4px; right: 4px; border-top: 1px solid var(--red); border-right: 1px solid var(--red); }
+    .c-bl { bottom: 4px; left: 4px; border-bottom: 1px solid var(--red); border-left: 1px solid var(--red); }
+    .c-br { bottom: 4px; right: 4px; border-bottom: 1px solid var(--red); border-right: 1px solid var(--red); }
+
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-top: 0.5rem; }
+    .count-box { background: rgba(192,37,26,0.08); border: 1px solid rgba(192,37,26,0.25); padding: 0.45rem 0.2rem; text-align: center; }
+    .count-num { font-family: 'Bodoni Moda', serif; font-size: 1.1rem; color: var(--red-light); display: block; line-height: 1; }
+    .count-label { font-size: 0.42rem; letter-spacing: 0.18em; color: var(--cream); opacity: 0.45; text-transform: uppercase; display: block; margin-top: 0.18rem; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+
+    a-scene { display: none; }
+    a-scene.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- AUDIO -->
+<audio id="bg-music" src="nocturne.mp3" loop preload="auto"></audio>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="top-label">The Wedding of</div>
+  <div class="ornament-line"></div>
+
+  <div class="couple-photos">
+    <div class="photo-frame"><img src="groom.png" alt="Abbyan" /></div>
+    <div class="amp">&</div>
+    <div class="photo-frame"><img src="bride.jpeg" alt="Nabila" /></div>
+  </div>
+
+  <div class="ornament-line"></div>
+
+  <div class="couple-names">
+    <span class="name-red">Abbyan Nur Faizy</span>
+    <span class="and-line">— &amp; —</span>
+    <span class="name-red">Nabila Alifia</span>
+  </div>
+
+  <div class="wedding-date">Saturday · 14 June 2025 · Bandung, West Java</div>
+
+  <div class="quran-quote">
+    "And He placed between you affection and mercy."<br/>
+    <span style="font-size:0.68rem;opacity:0.6;font-style:normal;letter-spacing:0.15em;color:#e87060;">— QS. Ar-Rum : 21</span>
+  </div>
+
+  <div class="ar-instruction">✦ &nbsp; Open your camera &nbsp; ✦<br/>Look around to discover our story</div>
+
+  <button id="start-btn">✦ &nbsp; Begin the Journey &nbsp; ✦</button>
+</div>
+
+<!-- PERMISSION -->
+<div id="permission-screen">
+  <div class="perm-icon">📷</div>
+  <h2>Allow Camera Access</h2>
+  <p>To experience our AR invitation, we need access to your camera and motion sensors.</p>
+  <button id="allow-btn">Allow Access</button>
+</div>
+
+<!-- MUSIC TOGGLE -->
+<button id="music-toggle" title="Toggle music">♪</button>
+
+<!-- AR OVERLAY -->
+<div id="ar-overlay">
+  <div class="overlay-top">
+    <div class="guide-title">Abbyan &amp; Nabila</div>
+    <div class="guide-sub">Tilt & move your phone to explore ✦</div>
+  </div>
+
+  <div id="tilt-guide">
+    <div class="tilt-arrow">↑</div>
+    <div class="tilt-text">Look Up to Begin</div>
+  </div>
+
+  <div class="overlay-bottom">
+    <div class="compass">
+      <button class="compass-btn" onclick="showPanel('akad')"><span>🌙</span>Akad</button>
+      <button class="compass-btn" onclick="showPanel('resepsi')"><span>🌹</span>Resepsi</button>
+      <button class="compass-btn" onclick="showPanel('venue')"><span>📍</span>Venue</button>
+      <button class="compass-btn" onclick="showPanel('countdown')"><span>⏳</span>Days</button>
+      <button class="compass-btn" onclick="showPanel('quran')"><span>✦</span>Doa</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANELS -->
+<div class="info-panel" id="panel-akad">
+  <div class="panel-inner">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-tag">✦ Akad Nikah</div>
+    <div class="panel-title">Sacred Vows</div>
+    <div class="panel-body">
+      <strong>Saturday, 14 June 2025</strong><br/>
+      08.00 – 10.00 WIB<br/><br/>
+      Masjid Al-Irsyad<br/>
+      Kota Baru Parahyangan<br/>
+      Padalarang, Bandung
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="panel-resepsi">
+  <div class="panel-inner">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-tag">✦ Resepsi</div>
+    <div class="panel-title">Celebration</div>
+    <div class="panel-body">
+      <strong>Saturday, 14 June 2025</strong><br/>
+      11.00 – 15.00 WIB<br/><br/>
+      Grand Ballroom<br/>
+      The Papandayan Hotel<br/>
+      Bandung, West Java
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="panel-venue">
+  <div class="panel-inner">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-tag">✦ Details</div>
+    <div class="panel-title">Dress & RSVP</div>
+    <div class="panel-body">
+      <strong>Dress Code</strong><br/>
+      Sage Green &amp; Dusty Gold<br/><br/>
+      <strong>RSVP by</strong><br/>
+      1 June 2025<br/><br/>
+      <strong>Contact</strong><br/>
+      +62 812-3456-7890
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="panel-countdown">
+  <div class="panel-inner">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-tag">✦ Counting Down</div>
+    <div class="panel-title">The Big Day</div>
+    <div class="countdown-grid">
+      <div class="count-box"><span class="count-num" id="cd-days">--</span><span class="count-label">Days</span></div>
+      <div class="count-box"><span class="count-num" id="cd-hours">--</span><span class="count-label">Hours</span></div>
+      <div class="count-box"><span class="count-num" id="cd-mins">--</span><span class="count-label">Mins</span></div>
+      <div class="count-box"><span class="count-num" id="cd-secs">--</span><span class="count-label">Secs</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="panel-quran">
+  <div class="panel-inner">
+    <div class="corner c-tl"></div><div class="corner c-tr"></div>
+    <div class="corner c-bl"></div><div class="corner c-br"></div>
+    <div class="panel-tag">✦ A Blessing</div>
+    <div class="panel-title">Our Prayer</div>
+    <div class="panel-body" style="font-style:italic;line-height:2.1;font-size:0.7rem;">
+      "And of His signs is that He created for you from yourselves mates that you may find tranquility in them; and He placed between you affection and mercy."
+      <br/><br/>
+      <span style="font-style:normal;letter-spacing:0.18em;font-size:0.58rem;color:#e87060;">— QS. Ar-Rum : 21</span>
+    </div>
+  </div>
+</div>
+
+<!-- A-FRAME SCENE -->
+<a-scene id="ar-scene" embedded
+  arjs="sourceType: webcam; debugUIEnabled: false;"
+  renderer="antialias: true; alpha: true"
+  vr-mode-ui="enabled: false">
+  <a-camera></a-camera>
+</a-scene>
+
+<script>
+  // MUSIC
+  const music = document.getElementById('bg-music');
+  const musicBtn = document.getElementById('music-toggle');
+  music.volume = 0;
+
+  function fadeInMusic() {
+    music.play().catch(() => {});
+    let vol = 0;
+    const interval = setInterval(() => {
+      vol = Math.min(vol + 0.02, 0.55);
+      music.volume = vol;
+      if (vol >= 0.55) clearInterval(interval);
+    }, 80);
+  }
+
+  musicBtn.addEventListener('click', () => {
+    if (music.paused) {
+      music.play();
+      musicBtn.textContent = '♪';
+      musicBtn.classList.remove('muted');
+    } else {
+      music.pause();
+      musicBtn.textContent = '♩';
+      musicBtn.classList.add('muted');
+    }
+  });
+
+  // COUNTDOWN
+  const weddingDate = new Date('2025-06-14T08:00:00+07:00');
+  function updateCountdown() {
+    const diff = weddingDate - new Date();
+    if (diff <= 0) { ['days','hours','mins','secs'].forEach(k => document.getElementById('cd-'+k).textContent='0'); return; }
+    document.getElementById('cd-days').textContent  = String(Math.floor(diff/86400000)).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-mins').textContent  = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-secs').textContent  = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  }
+  setInterval(updateCountdown, 1000); updateCountdown();
+
+  // PANEL LOGIC
+  const allPanels = ['akad','resepsi','venue','countdown','quran'];
+  let activePanel = null;
+
+  function showPanel(name) {
+    allPanels.forEach(p => {
+      const el = document.getElementById('panel-'+p);
+      el.classList.remove('visible');
+      setTimeout(() => { if (!el.classList.contains('visible')) el.style.display='none'; }, 560);
+    });
+    document.querySelectorAll('.compass-btn').forEach(b => b.classList.remove('active'));
+    if (activePanel === name) { activePanel = null; return; }
+    activePanel = name;
+    const target = document.getElementById('panel-'+name);
+    target.style.display = 'block';
+    requestAnimationFrame(() => requestAnimationFrame(() => target.classList.add('visible')));
+    // highlight button
+    const btns = document.querySelectorAll('.compass-btn');
+    const idx = allPanels.indexOf(name);
+    if (btns[idx]) btns[idx].classList.add('active');
+  }
+
+  // START
+  document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('permission-screen').classList.add('active');
+  });
+
+  document.getElementById('allow-btn').addEventListener('click', async () => {
+    document.getElementById('permission-screen').classList.remove('active');
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        await DeviceOrientationEvent.requestPermission();
+      }
+    } catch(e) {}
+    startAR();
+  });
+
+  function startAR() {
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('ar-overlay').classList.add('active');
+    document.getElementById('ar-scene').classList.add('active');
+    const tg = document.getElementById('tilt-guide');
+    setTimeout(() => tg.classList.add('hidden'), 3200);
+    setTimeout(() => showPanel('akad'), 2000);
+
+    // Start music with fade-in
+    fadeInMusic();
+    musicBtn.classList.add('visible');
+
+    initGyro();
+  }
+
+  // GYROSCOPE
+  let lastBeta = 90, gyroLock = false;
+  const panelOrder = ['akad','resepsi','venue','countdown','quran'];
+  let pIdx = 0;
+
+  function initGyro() {
+    window.addEventListener('deviceorientation', e => {
+      if (gyroLock) return;
+      const beta = e.beta ?? 90;
+      const gamma = e.gamma ?? 0;
+
+      if (beta < 25 && lastBeta >= 25) {        // tilted up → next panel
+        triggerPanel(panelOrder[pIdx++ % panelOrder.length]);
+      } else if (gamma < -38) {                  // tilt left → akad
+        triggerPanel('akad');
+      } else if (gamma > 38) {                   // tilt right → resepsi
+        triggerPanel('resepsi');
+      }
+      lastBeta = beta;
+    });
+  }
+
+  function triggerPanel(name) {
+    gyroLock = true;
+    showPanel(name);
+    setTimeout(() => gyroLock = false, 2200);
+  }
+</script>
+</body>
+</html>
