@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>Abbyan & Nabila</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Dancing+Script:wght@700&family=Jost:wght@200;300;400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Bebas+Neue&family=Great+Vibes&family=Pinyon+Script&family=Jost:wght@200;300;400&display=swap');
+    /*
+      TAN Harmoni  → Bebas Neue  (ultra-condensed bold display)
+      ITC Edwardian Script → Great Vibes (elegant swash script)
+      Snell Roundhand → Pinyon Script (roundhand italic script)
+      Playfair Display → Playfair Display ✓ exact
+    */
 
     :root {
       --blue:      #6b7fd4;
@@ -28,124 +34,158 @@
     }
 
     /* ══════════════════════════════
-       LANDING — Canva design match
+       LANDING
     ══════════════════════════════ */
     #landing {
       position:fixed; inset:0; z-index:900;
       display:flex; flex-direction:column;
       align-items:center; justify-content:flex-start;
       text-align:center; padding:0;
-      background: #080808;
-      transition: opacity .7s ease;
+      background:#080808;
+      transition:opacity .7s ease;
       overflow:hidden;
     }
     #landing.out { opacity:0; pointer-events:none; }
 
-    /* top ornament SVG */
+    /* top ornament */
     .ornament-top {
-      width:80%; max-width:320px;
-      margin-top:clamp(2rem, 7vw, 3.5rem);
-      opacity:.85;
-      animation: up 1s ease both;
+      width:85%; max-width:340px;
+      margin-top:clamp(1.8rem,6vw,3rem);
+      opacity:.8;
+      animation:up 1s ease both;
     }
 
-    /* "The Wedding Of" label */
+    /* "The Wedding Of" — Playfair Display bold, blue */
     .lbl {
-      font-family:'Playfair Display', serif;
-      font-size:clamp(.9rem,4vw,1.2rem);
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1rem,4.5vw,1.3rem);
       font-weight:700; color:var(--blue);
-      letter-spacing:.05em;
-      margin-top:clamp(.8rem,3vw,1.2rem);
-      animation: up 1s ease .1s both;
+      letter-spacing:.03em;
+      margin-top:clamp(.5rem,2vw,.9rem);
+      animation:up 1s ease .1s both;
     }
 
-    /* Big names block — ABBYAN & NABILA */
+    /* ABBYAN / NABILA — Bebas Neue (TAN Harmoni substitute) */
     .names-block {
       position:relative;
-      margin-top:clamp(.2rem,1.5vw,.5rem);
-      line-height:.88;
-      animation: up 1s ease .2s both;
+      margin-top:clamp(.1rem,1vw,.3rem);
+      line-height:.85;
+      padding-right:clamp(2.5rem,10vw,4rem); /* space for ampersand */
+      animation:up 1s ease .2s both;
     }
     .big-name {
       display:block;
-      font-family:'Playfair Display', serif;
-      font-size:clamp(4rem,20vw,7rem);
-      font-weight:900;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(4.5rem,22vw,8rem);
+      font-weight:400;
       color:var(--cream);
-      letter-spacing:-.01em;
+      letter-spacing:.02em;
       text-transform:uppercase;
+      line-height:.9;
     }
-    /* Big swash ampersand — blue, italic, overlapping */
+    /* Big swash & — Great Vibes (ITC Edwardian Script substitute) */
     .big-amp {
       position:absolute;
-      right:clamp(-1.5rem,-5vw,-3rem);
-      top:50%; transform:translateY(-58%);
-      font-family:'Dancing Script', cursive;
-      font-size:clamp(4rem,18vw,7rem);
-      font-weight:700; color:var(--blue);
+      right:clamp(-1rem,-1vw,-.5rem);
+      top:48%; transform:translateY(-50%);
+      font-family:'Great Vibes',cursive;
+      font-size:clamp(4rem,19vw,7.5rem);
+      font-weight:400; color:var(--blue);
       line-height:1; pointer-events:none;
-      animation: up 1s ease .25s both;
     }
 
-    /* date script */
+    /* date — Pinyon Script (Snell Roundhand substitute) */
     .date-script {
-      font-family:'Dancing Script', cursive;
-      font-size:clamp(1.1rem,5vw,1.6rem);
-      font-weight:700; color:var(--blue);
-      margin-top:clamp(.4rem,2vw,.8rem);
-      animation: up 1s ease .35s both;
+      font-family:'Pinyon Script',cursive;
+      font-size:clamp(1.2rem,5.5vw,1.8rem);
+      color:var(--blue);
+      margin-top:clamp(.2rem,1.5vw,.5rem);
+      animation:up 1s ease .3s both;
+      line-height:1.3;
+    }
+    .date-script sup {
+      font-size:.55em; vertical-align:super;
     }
 
-    /* couple photo circles */
-    .photo-row {
-      display:flex; gap:clamp(2rem,10vw,4rem);
-      justify-content:center; align-items:center;
-      margin-top:clamp(1rem,4vw,1.8rem);
-      animation: up 1s ease .45s both;
-    }
-    .circle-frame {
-      width:clamp(52px,14vw,70px);
-      height:clamp(52px,14vw,70px);
-      border-radius:50%;
-      border:1.5px solid var(--blue);
-      overflow:hidden;
+    /* ornate frame — Quran verse */
+    .verse-frame {
       position:relative;
+      width:88%; max-width:340px;
+      margin-top:clamp(.8rem,3vw,1.4rem);
+      animation:up 1s ease .4s both;
     }
-    .circle-frame img {
-      width:100%; height:100%;
-      object-fit:cover; object-position:top;
-      filter:grayscale(100%) contrast(1.1);
-      display:block;
+    .verse-frame svg.frame-svg {
+      width:100%; display:block;
+    }
+    .verse-text {
+      position:absolute;
+      inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:clamp(.8rem,3vw,1.2rem) clamp(1rem,4vw,1.6rem);
+    }
+    .verse-quote {
+      font-family:'Playfair Display',serif;
+      font-style:italic; font-size:clamp(.65rem,2.8vw,.85rem);
+      color:#111; line-height:1.7;
+    }
+    .verse-ref {
+      font-family:'Playfair Display',serif;
+      font-style:italic; font-size:clamp(.6rem,2.5vw,.75rem);
+      color:#444; margin-top:.4rem;
+    }
+
+    /* "POINT YOUR CAMERA" instruction below frame */
+    .cam-hint {
+      margin-top:clamp(.6rem,2.5vw,1rem);
+      animation:up 1s ease .5s both;
+    }
+    .cam-hint .dots {
+      display:flex; align-items:center; justify-content:center;
+      gap:.5rem; margin-bottom:.3rem;
+    }
+    .cam-hint .dot {
+      width:6px; height:6px; border-radius:50%;
+      border:1px solid #c0251a;
+    }
+    .cam-hint .point-text {
+      font-family:'Jost',sans-serif; font-weight:700;
+      font-size:clamp(.55rem,2.2vw,.7rem);
+      letter-spacing:.35em; color:#111;
+      text-transform:uppercase;
+    }
+    .cam-hint .tilt-text {
+      font-family:'Jost',sans-serif; font-weight:400;
+      font-size:clamp(.55rem,2.2vw,.7rem);
+      letter-spacing:.25em; color:#111;
+      text-transform:uppercase; margin-top:.15rem;
     }
 
     /* Begin The Journey pill button */
     #btn {
-      margin-top:clamp(1.2rem,5vw,2rem);
+      margin-top:clamp(.8rem,3.5vw,1.4rem);
       display:flex; align-items:center; gap:.8rem;
       background:transparent;
       border:2px solid var(--blue);
       border-radius:999px;
       color:var(--blue);
-      font-family:'Jost', sans-serif;
+      font-family:'Jost',sans-serif;
       font-size:clamp(.7rem,3vw,.9rem);
       font-weight:300; letter-spacing:.12em;
-      padding:.75rem 1.5rem .75rem 2rem;
+      padding:.7rem 1.2rem .7rem 2rem;
       cursor:pointer; transition:all .35s;
-      animation: up 1s ease .55s both;
+      animation:up 1s ease .6s both;
       -webkit-tap-highlight-color:transparent;
     }
-    #btn:active, #btn:hover {
-      background:var(--blue); color:#fff;
-    }
+    #btn:active,#btn:hover { background:var(--blue); color:#fff; }
     .btn-play {
-      width:clamp(28px,7vw,36px); height:clamp(28px,7vw,36px);
+      width:clamp(28px,7vw,34px); height:clamp(28px,7vw,34px);
       border-radius:50%; background:var(--blue);
       display:flex; align-items:center; justify-content:center;
       flex-shrink:0; transition:background .35s;
     }
-    #btn:active .btn-play, #btn:hover .btn-play { background:#fff; }
-    .btn-play svg { fill:#fff; width:40%; height:40%; margin-left:10%; }
-    #btn:active .btn-play svg, #btn:hover .btn-play svg { fill:var(--blue); }
+    #btn:active .btn-play,#btn:hover .btn-play { background:#fff; }
+    .btn-play svg { fill:#fff; width:38%; height:38%; margin-left:8%; }
+    #btn:active .btn-play svg,#btn:hover .btn-play svg { fill:var(--blue); }
 
     /* ══════════════════════════════
        AR LAYER — completely transparent
@@ -309,49 +349,93 @@
 ══════════════════ -->
 <div id="landing">
 
-  <!-- Top ornament SVG -->
-  <svg class="ornament-top" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg" fill="none">
-    <g stroke="#e8dcc8" stroke-width="1.2" opacity="0.75">
-      <!-- left curl -->
-      <path d="M10,30 Q30,10 50,30 Q70,50 90,30" fill="none"/>
-      <path d="M5,30 Q25,5 50,30 Q75,55 95,30" fill="none"/>
-      <path d="M2,32 C15,15 35,8 50,30 C65,52 85,58 95,32" fill="none"/>
-      <!-- right curl (mirror) -->
-      <path d="M390,30 Q370,10 350,30 Q330,50 310,30" fill="none"/>
-      <path d="M395,30 Q375,5 350,30 Q325,55 305,30" fill="none"/>
-      <path d="M398,32 C385,15 365,8 350,30 C335,52 315,58 305,32" fill="none"/>
-      <!-- centre crown -->
-      <path d="M95,30 Q150,5 200,20 Q250,5 305,30" fill="none"/>
-      <path d="M100,32 Q155,8 200,22 Q245,8 300,32" fill="none"/>
-      <path d="M170,22 Q185,5 200,15 Q215,5 230,22" fill="none"/>
-      <path d="M175,24 Q188,8 200,17 Q212,8 225,24" fill="none"/>
-      <!-- centre dot -->
-      <circle cx="200" cy="14" r="2.5" fill="#e8dcc8" stroke="none"/>
-      <circle cx="187" cy="20" r="1.5" fill="#e8dcc8" stroke="none"/>
-      <circle cx="213" cy="20" r="1.5" fill="#e8dcc8" stroke="none"/>
+  <!-- Top ornament SVG — matches Canva scroll/flourish -->
+  <svg class="ornament-top" viewBox="0 0 400 55" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <g stroke="#e8dcc8" stroke-width="1.3" opacity="0.8" stroke-linecap="round">
+      <!-- left scroll -->
+      <path d="M8,28 C20,10 40,8 52,20 C60,28 55,40 45,36 C35,32 38,22 48,24"/>
+      <path d="M4,32 C18,6 44,4 58,18 C68,28 62,44 50,40"/>
+      <!-- left wave to centre -->
+      <path d="M55,26 C80,12 110,18 140,22 C160,24 175,20 190,18"/>
+      <path d="M55,30 C82,16 112,22 142,26 C162,28 177,24 192,22"/>
+      <!-- right scroll (mirror) -->
+      <path d="M392,28 C380,10 360,8 348,20 C340,28 345,40 355,36 C365,32 362,22 352,24"/>
+      <path d="M396,32 C382,6 356,4 342,18 C332,28 338,44 350,40"/>
+      <!-- right wave to centre -->
+      <path d="M345,26 C320,12 290,18 260,22 C240,24 225,20 210,18"/>
+      <path d="M345,30 C318,16 288,22 258,26 C238,28 223,24 208,22"/>
+      <!-- centre crown peak -->
+      <path d="M190,18 C194,8 197,4 200,6 C203,4 206,8 210,18"/>
+      <path d="M192,22 C196,10 199,6 200,8 C201,6 204,10 208,22"/>
+      <!-- centre dots -->
+      <circle cx="200" cy="5" r="2" fill="#e8dcc8" stroke="none"/>
+      <circle cx="193" cy="14" r="1.3" fill="#e8dcc8" stroke="none"/>
+      <circle cx="207" cy="14" r="1.3" fill="#e8dcc8" stroke="none"/>
     </g>
   </svg>
 
-  <!-- "The Wedding Of" -->
+  <!-- "The Wedding Of" — Playfair Display -->
   <div class="lbl">The Wedding Of</div>
 
-  <!-- Big names with swash ampersand -->
+  <!-- Big stacked names + swash ampersand -->
   <div class="names-block">
     <span class="big-name">ABBYAN</span>
     <span class="big-name">NABILA</span>
     <span class="big-amp">&amp;</span>
   </div>
 
-  <!-- Date -->
+  <!-- Date — Pinyon Script -->
   <div class="date-script">Saturday, June 14<sup>th</sup> 2026</div>
 
-  <!-- Couple photo circles -->
-  <div class="photo-row">
-    <div class="circle-frame"><img src="groom.png" alt="Abbyan"/></div>
-    <div class="circle-frame"><img src="bride.jpeg" alt="Nabila"/></div>
+  <!-- Ornate frame with Quran verse (white bg, black border) -->
+  <div class="verse-frame">
+    <!-- Ornate double-border frame SVG -->
+    <svg class="frame-svg" viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg">
+      <!-- white fill background -->
+      <rect x="4" y="4" width="332" height="122" rx="18" ry="18" fill="white"/>
+      <!-- outer ornate border -->
+      <rect x="4" y="4" width="332" height="122" rx="18" ry="18"
+        fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+      <!-- inner border -->
+      <rect x="12" y="12" width="316" height="106" rx="13" ry="13"
+        fill="none" stroke="#1a1a1a" stroke-width="1"/>
+      <!-- corner flourishes TL -->
+      <path d="M4,22 Q4,4 22,4" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+      <path d="M8,24 Q8,8 24,8" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <!-- corner flourishes TR -->
+      <path d="M318,4 Q336,4 336,22" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+      <path d="M316,8 Q332,8 332,24" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <!-- corner flourishes BL -->
+      <path d="M4,108 Q4,126 22,126" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+      <path d="M8,106 Q8,122 24,122" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <!-- corner flourishes BR -->
+      <path d="M318,126 Q336,126 336,108" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+      <path d="M316,122 Q332,122 332,106" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <!-- top centre ornament -->
+      <path d="M155,4 Q170,0 185,4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+      <path d="M160,8 Q170,5 180,8" fill="none" stroke="#1a1a1a" stroke-width=".7"/>
+      <!-- bottom centre ornament -->
+      <path d="M155,126 Q170,130 185,126" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+      <path d="M160,122 Q170,125 180,122" fill="none" stroke="#1a1a1a" stroke-width=".7"/>
+    </svg>
+    <!-- Text layered on top of frame SVG -->
+    <div class="verse-text">
+      <div class="verse-quote">"And He placed between you affection &amp; mercy"</div>
+      <div class="verse-ref">– Ar Rum: 21</div>
+    </div>
   </div>
 
-  <!-- Begin button -->
+  <!-- "Point your camera / Tilt to find..." -->
+  <div class="cam-hint">
+    <div class="dots">
+      <span class="dot"></span>
+      <span class="point-text">Point Your Camera</span>
+      <span class="dot"></span>
+    </div>
+    <div class="tilt-text">Tilt To Find Our Moments Around You</div>
+  </div>
+
+  <!-- Begin The Journey pill button -->
   <button id="btn">
     Begin The Journey
     <span class="btn-play">
