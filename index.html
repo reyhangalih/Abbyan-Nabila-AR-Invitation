@@ -318,6 +318,65 @@
       text-shadow:0 1px 4px #000;
     }
 
+    /* ══════════════════════════════
+       PERMISSION SCREEN
+       shown first, before landing
+    ══════════════════════════════ */
+    #perm-screen {
+      position:fixed; inset:0; z-index:1000;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; padding:2.5rem 2rem;
+      background:#080808;
+      transition:opacity .6s ease;
+    }
+    #perm-screen.out { opacity:0; pointer-events:none; }
+
+    .perm-icon {
+      font-size:3.5rem; margin-bottom:1.5rem;
+      animation: up 1s ease both;
+    }
+    .perm-title {
+      font-family:'Playfair Display',serif;
+      font-style:italic; font-size:1.4rem;
+      color:var(--cream); margin-bottom:.8rem;
+      animation: up 1s ease .1s both;
+    }
+    .perm-sub {
+      font-family:'Jost',sans-serif;
+      font-weight:300; font-size:.78rem;
+      color:var(--cream); opacity:.5;
+      line-height:1.9; max-width:260px;
+      margin-bottom:2rem;
+      animation: up 1s ease .2s both;
+    }
+    #perm-btn {
+      display:flex; align-items:center; gap:.8rem;
+      background:var(--blue); border:none;
+      border-radius:999px; color:#fff;
+      font-family:'Jost',sans-serif;
+      font-size:.75rem; font-weight:300;
+      letter-spacing:.18em; text-transform:uppercase;
+      padding:.85rem 2.2rem;
+      cursor:pointer; transition:all .3s;
+      animation: up 1s ease .3s both;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #perm-btn:active { opacity:.8; transform:scale(.97); }
+    .perm-note {
+      font-family:'Jost',sans-serif;
+      font-size:.6rem; color:var(--cream);
+      opacity:.3; margin-top:1.2rem;
+      animation: up 1s ease .4s both;
+    }
+
+    /* landing hidden by default, shown after permission */
+    #landing { display:none; }
+    #landing.show {
+      display:flex;
+      animation: up .8s ease both;
+    }
+
     /* float animations */
     @keyframes fl1{0%,100%{margin-top:0}50%{margin-top:-7px}}
     @keyframes fl2{0%,100%{margin-top:-4px}50%{margin-top:3px}}
@@ -343,6 +402,20 @@
 <!-- MUSIC -->
 <audio id="bgm" src="nocturne.mp3" loop preload="auto"></audio>
 <button id="mus" aria-label="music">♪</button>
+
+<!-- ══════════════════════════════
+     PERMISSION SCREEN (shown first)
+══════════════════════════════ -->
+<div id="perm-screen">
+  <div class="perm-icon">📷</div>
+  <div class="perm-title">Abbyan &amp; Nabila</div>
+  <div class="perm-sub">
+    This invitation uses your camera to create a magical AR experience.<br/>
+    Please allow camera access to begin.
+  </div>
+  <button id="perm-btn">Allow Camera Access</button>
+  <div class="perm-note">We do not store or record any camera footage.</div>
+</div>
 
 <!-- ══════════════════
      LANDING
@@ -553,7 +626,7 @@
 'use strict';
 
 /* ── COUNTDOWN ── */
-const WED = new Date('2025-06-14T08:00:00+07:00');
+const WED = new Date('2026-06-14T08:00:00+07:00');
 function tick(){
   const d = WED - Date.now();
   if(d<=0){['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent='00');return;}
@@ -569,7 +642,7 @@ setInterval(tick,1000); tick();
 const bgm=document.getElementById('bgm');
 const musBtn=document.getElementById('mus');
 bgm.volume=0;
-function fadeIn(){
+function fadeMusic(){
   bgm.play().catch(()=>{});
   let v=0;
   const iv=setInterval(()=>{v=Math.min(v+0.02,.5);bgm.volume=v;if(v>=.5)clearInterval(iv);},80);
@@ -581,101 +654,121 @@ musBtn.addEventListener('click',()=>{
 
 /* ── CAMERA ── */
 async function startCam(){
+  const vid = document.getElementById('cam');
   try{
     const stream = await navigator.mediaDevices.getUserMedia({
       video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} },
       audio:false
     });
-    const vid = document.getElementById('cam');
     vid.srcObject = stream;
-    /* wait for video to actually start playing before we fade landing */
-    return new Promise(resolve=>{
+    /* wait for actual playback before resolving */
+    await new Promise(resolve=>{
       vid.oncanplay = ()=>{ vid.play(); resolve(); };
-      /* safety fallback — resolve after 1.5s even if oncanplay is slow */
-      setTimeout(resolve, 1500);
+      setTimeout(resolve, 1500); /* safety timeout */
     });
+    return true;
   }catch(e){
     console.warn('Camera unavailable:', e);
-    /* no camera → just resolve so flow continues */
+    return false;
   }
 }
 
-/* ══════════════════════════════════════════
+/* ══════════════════════════════
    GYRO PARALLAX
-══════════════════════════════════════════ */
+══════════════════════════════ */
 const ANCHORS = {
-  pa: { ax: -0.7, ay:  0   },
-  pr: { ax:  0.7, ay:  0   },
-  pv: { ax:  0,   ay: -0.7 },
-  pq: { ax: -0.6, ay:  0.7 },
-  pc: { ax:  0.6, ay:  0.7 },
+  pa:{ ax:-0.7, ay: 0   },
+  pr:{ ax: 0.7, ay: 0   },
+  pv:{ ax: 0,   ay:-0.7 },
+  pq:{ ax:-0.6, ay: 0.7 },
+  pc:{ ax: 0.6, ay: 0.7 },
 };
-
 let smoothG=0, smoothB=90;
 
 function applyGyro(gamma, beta){
   const W=window.innerWidth, H=window.innerHeight;
-  const gFactor = Math.max(-1, Math.min(1, gamma / 30));
-  const bFactor = Math.max(-1, Math.min(1, (beta-90) / 30));
+  const gF=Math.max(-1,Math.min(1,gamma/30));
+  const bF=Math.max(-1,Math.min(1,(beta-90)/30));
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el)return;
-    const tx = (ax + gFactor * 0.7) * W * 0.5;
-    const ty = (ay + bFactor * 0.7) * H * 0.5;
-    el.style.transform=`translate(${tx}px,${ty}px)`;
+    el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
   });
 }
 
 function initGyro(){
   let hasGyro=false;
-  window.addEventListener('deviceorientation', e=>{
-    if(e.gamma===null && e.beta===null)return;
+  window.addEventListener('deviceorientation',e=>{
+    if(e.gamma===null&&e.beta===null)return;
     hasGyro=true;
-    smoothG += (e.gamma - smoothG)*0.10;
-    smoothB += (e.beta  - smoothB)*0.10;
-    applyGyro(smoothG, smoothB);
+    smoothG+=(e.gamma-smoothG)*0.10;
+    smoothB+=(e.beta-smoothB)*0.10;
+    applyGyro(smoothG,smoothB);
   });
   setTimeout(()=>{
-    if(!hasGyro){
-      Object.keys(ANCHORS).forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.style.transform='translate(0,0)';
-      });
-    }
+    if(!hasGyro) Object.keys(ANCHORS).forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.style.transform='translate(0,0)';
+    });
   },2500);
 }
 
-/* ── START BUTTON ── */
-document.getElementById('btn').addEventListener('click', async()=>{
+/* ══════════════════════════════════════════════════
+   FLOW:
+   1. User taps "Allow Camera Access" on perm screen
+   2. Camera permission dialog → user allows
+   3. Camera starts streaming (video el gets srcObject)
+   4. Perm screen fades out
+   5. Landing appears — camera already live behind it
+   6. User taps "Begin The Journey"
+   7. Landing fades out → full AR experience
+══════════════════════════════════════════════════ */
 
-  /* 1. iOS gyro permission — must be on user gesture */
-  if(typeof DeviceOrientationEvent!=='undefined' &&
+/* ── STEP 1: Permission button ── */
+document.getElementById('perm-btn').addEventListener('click', async()=>{
+
+  /* iOS 13+ requires explicit DeviceOrientation permission on user gesture */
+  if(typeof DeviceOrientationEvent!=='undefined'&&
      typeof DeviceOrientationEvent.requestPermission==='function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
 
-  /* 2. Start camera and WAIT for stream to be ready */
-  await startCam();
+  /* Start camera — this triggers the browser permission dialog */
+  const camOk = await startCam();
 
-  /* 3. NOW fade out landing — camera is already running behind it */
+  /* Fade out permission screen */
+  const perm = document.getElementById('perm-screen');
+  perm.classList.add('out');
+  setTimeout(()=>{ perm.style.display='none'; }, 700);
+
+  /* Show landing — camera is already live behind it */
+  setTimeout(()=>{
+    document.getElementById('landing').classList.add('show');
+  }, 300);
+});
+
+/* ── STEP 2: Begin Journey button ── */
+document.getElementById('btn').addEventListener('click', ()=>{
+
+  /* Fade out landing */
   const land = document.getElementById('landing');
   land.classList.add('out');
   setTimeout(()=>{ land.style.display='none'; }, 800);
 
-  /* 4. Show AR layer + music toggle */
+  /* Show AR layer + music toggle */
   document.getElementById('ar-ui').classList.add('on');
   musBtn.classList.add('on');
 
-  /* 5. Reveal all panels */
+  /* Reveal all floating panels */
   document.querySelectorAll('.panel').forEach(p=>p.classList.add('on'));
 
-  /* 6. Hide tilt hint after 5s */
+  /* Hide tilt hint after 5s */
   setTimeout(()=>document.getElementById('hint').classList.add('gone'), 5000);
 
-  /* 7. Fade in music */
-  fadeIn();
+  /* Fade in music */
+  fadeMusic();
 
-  /* 8. Start gyro */
+  /* Start gyro parallax */
   initGyro();
 });
 </script>
