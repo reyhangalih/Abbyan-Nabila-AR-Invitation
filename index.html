@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Abbyan & Nabila — Wedding Invitation</title>
-
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Cinzel+Decorative:wght@400;700&family=Jost:wght@200;300;400&display=swap');
 
@@ -15,31 +14,32 @@
       --red-light: #e87060;
       --cream: #f2e8d9;
       --cream-dark: #d9c9b0;
-      --dark: #0f0808;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      font-family: 'Jost', sans-serif;
-      background: #000;
-      color: var(--cream);
-      height: 100dvh;
+    html, body {
+      width: 100%; height: 100%;
       overflow: hidden;
+      background: transparent;
+      font-family: 'Jost', sans-serif;
+      color: var(--cream);
     }
 
-    /* ── CAMERA FEED ── */
+    /* ── CAMERA (always behind everything) ── */
     #camera-feed {
       position: fixed; inset: 0; z-index: 0;
       width: 100%; height: 100%;
       object-fit: cover;
-      display: none;
+      background: #000;
     }
-    #camera-feed.active { display: block; }
 
-    /* ── LANDING ── */
+    /* ══════════════════════════════════════
+       LANDING SCREEN
+       — solid dark bg only while on landing
+    ══════════════════════════════════════ */
     #landing {
-      position: fixed; inset: 0; z-index: 200;
+      position: fixed; inset: 0; z-index: 100;
       background:
         radial-gradient(ellipse at 20% 10%, #2a0a0a 0%, transparent 55%),
         radial-gradient(ellipse at 80% 90%, #1a0505 0%, transparent 55%),
@@ -47,13 +47,11 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center; padding: 2.5rem 2rem;
-      transition: opacity 1s ease, visibility 1s;
+      transition: opacity 0.8s ease;
     }
-    #landing.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    #landing::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-      opacity: 0.5; pointer-events: none;
+    #landing.gone {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .top-label {
@@ -89,27 +87,25 @@
       border-radius: 50% / 45%;
       border: 1px solid rgba(192,37,26,0.2); z-index: -2;
     }
-    .amp {
-      font-family: 'Bodoni Moda', serif; font-size: 2rem;
-      color: var(--red); font-style: italic; opacity: 0.85;
-    }
+    .amp { font-family: 'Bodoni Moda', serif; font-size: 2rem; color: var(--red); font-style: italic; }
     .couple-names {
       font-family: 'Bodoni Moda', serif;
       font-size: clamp(1.5rem, 6.5vw, 2.2rem); font-weight: 900;
-      line-height: 1.1; animation: fadeUp 1.2s ease 0.4s both;
+      line-height: 1.15; animation: fadeUp 1.2s ease 0.4s both;
     }
     .name-red {
+      display: block; font-style: italic;
       background: linear-gradient(90deg, var(--red-deep), var(--red-light), var(--red-bright), var(--red-light), var(--red-deep));
-      background-size: 200% auto; -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent; background-clip: text;
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
       animation: shimmer 3s linear infinite;
-      font-style: italic; display: block;
     }
     .and-line {
-      display: block; font-size: 0.5em; color: var(--red-light);
-      letter-spacing: 0.4em; font-style: normal;
-      font-family: 'Cinzel Decorative', serif; font-weight: 400; margin: 0.3em 0;
-      -webkit-text-fill-color: var(--red-light);
+      display: block; font-size: 0.5em; font-style: normal;
+      font-family: 'Cinzel Decorative', serif; font-weight: 400;
+      letter-spacing: 0.4em; margin: 0.3em 0;
+      color: var(--red-light); -webkit-text-fill-color: var(--red-light);
     }
     .wedding-date {
       font-family: 'Cinzel Decorative', serif; font-size: 0.52rem;
@@ -142,182 +138,154 @@
       background: var(--red); transform: scaleX(0);
       transform-origin: left; transition: transform 0.4s ease; z-index: -1;
     }
-    #start-btn:hover::before, #start-btn:active::before { transform: scaleX(1); }
-    #start-btn:hover, #start-btn:active { color: var(--cream); }
+    #start-btn:active::before, #start-btn:hover::before { transform: scaleX(1); }
+    #start-btn:active, #start-btn:hover { color: var(--cream); }
 
-    /* ── AR OVERLAY ── */
-    #ar-overlay {
+    /* ══════════════════════════════════════
+       AR EXPERIENCE LAYER
+       — shown after landing fades
+    ══════════════════════════════════════ */
+    #ar-layer {
       position: fixed; inset: 0; z-index: 50;
-      pointer-events: none; display: none;
+      display: none; pointer-events: none;
     }
-    #ar-overlay.active { display: block; }
+    #ar-layer.active { display: block; }
 
-    .overlay-top {
+    /* Top bar */
+    .ar-top {
       position: absolute; top: 0; left: 0; right: 0;
-      padding: 2rem 1.5rem 3rem;
-      background: linear-gradient(to bottom, rgba(8,2,2,0.85) 0%, transparent 100%);
-      text-align: center;
+      padding: 1.6rem 1rem 2rem;
+      background: linear-gradient(to bottom, rgba(6,1,1,0.7) 0%, transparent 100%);
+      text-align: center; pointer-events: none;
     }
-    .guide-title {
-      font-family: 'Cinzel Decorative', serif; font-size: 0.52rem;
-      letter-spacing: 0.4em; color: var(--red-light); text-transform: uppercase;
+    .ar-names {
+      font-family: 'Bodoni Moda', serif; font-size: 1rem;
+      font-style: italic; font-weight: 700;
+      background: linear-gradient(90deg, var(--red-deep), var(--red-light), var(--red-bright), var(--red-light), var(--red-deep));
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+      text-shadow: none;
     }
-    .guide-sub {
-      font-size: 0.72rem; font-weight: 300; color: var(--cream);
-      opacity: 0.5; margin-top: 0.35rem; letter-spacing: 0.08em;
+    .ar-hint {
+      font-size: 0.58rem; font-weight: 300; letter-spacing: 0.12em;
+      color: var(--cream); opacity: 0.5; margin-top: 0.3rem;
     }
 
     /* Music toggle */
     #music-toggle {
-      position: fixed; top: 1.2rem; right: 1.2rem; z-index: 300;
-      background: rgba(10,3,3,0.75); border: 1px solid rgba(192,37,26,0.4);
-      color: var(--red-light); width: 42px; height: 42px;
+      position: fixed; top: 1rem; right: 1rem; z-index: 200;
+      background: rgba(10,3,3,0.7); border: 1px solid rgba(192,37,26,0.4);
+      color: var(--red-light); width: 40px; height: 40px;
       border-radius: 50%; cursor: pointer; font-size: 1.1rem;
       display: none; align-items: center; justify-content: center;
-      backdrop-filter: blur(8px); transition: all 0.3s;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      transition: all 0.3s; pointer-events: all;
       -webkit-tap-highlight-color: transparent;
     }
-    #music-toggle.visible { display: flex; }
-    #music-toggle:hover { background: rgba(192,37,26,0.25); border-color: var(--red); }
+    #music-toggle.show { display: flex; }
     #music-toggle.muted { opacity: 0.4; }
 
-    .overlay-bottom {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 3rem 1rem 2.2rem;
-      background: linear-gradient(to top, rgba(8,2,2,0.88) 0%, transparent 100%);
-      text-align: center;
+    /* ══════════════════════════════════════
+       FLOATING PANELS — all visible at once
+    ══════════════════════════════════════ */
+    .panel {
+      position: fixed; z-index: 60;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
-    .compass {
-      display: flex; gap: 0.5rem; justify-content: center;
-      align-items: center; pointer-events: all;
-    }
-    .compass-btn {
-      background: rgba(192,37,26,0.12);
-      border: 1px solid rgba(192,37,26,0.38);
-      color: var(--red-light); font-family: 'Cinzel Decorative', serif;
-      font-size: 0.38rem; letter-spacing: 0.1em;
-      padding: 0.6rem 0.65rem; cursor: pointer;
-      transition: all 0.3s; display: flex;
-      flex-direction: column; align-items: center; gap: 0.25rem;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .compass-btn span { font-size: 1.1rem; }
-    .compass-btn.active, .compass-btn:hover {
-      background: rgba(192,37,26,0.32); border-color: var(--red); color: var(--cream);
+    .panel.show {
+      opacity: 1; pointer-events: auto;
     }
 
-    /* ── TILT GUIDE ── */
-    #tilt-guide {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 55; text-align: center;
-      pointer-events: none; transition: opacity 0.8s;
-    }
-    #tilt-guide.hidden { opacity: 0; }
-    .tilt-arrow { font-size: 2.5rem; color: var(--red); animation: bounce 1.2s ease infinite; }
-    .tilt-text {
-      font-family: 'Cinzel Decorative', serif; font-size: 0.48rem;
-      letter-spacing: 0.35em; color: var(--red-light);
-      text-transform: uppercase; margin-top: 0.4rem; opacity: 0.85;
-      /* readable on camera background */
-      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
-    }
+    /* Layout: scatter all 5 across screen */
+    #p-akad    { top: 12%;  left: 4%;   width: 170px; transform: translateY(12px); }
+    #p-resepsi { top: 12%;  right: 4%;  width: 170px; transform: translateY(12px); }
+    #p-venue   { top: 38%;  left: 50%;  width: 175px; transform: translateX(-50%) translateY(12px); }
+    #p-quran   { bottom: 26%; left: 4%;  width: 170px; transform: translateY(12px); }
+    #p-countdown { bottom: 26%; right: 4%; width: 170px; transform: translateY(12px); }
 
-    /* ── INFO PANELS ── */
-    .info-panel {
-      position: fixed; z-index: 60; width: 185px;
-      opacity: 0; transform: scale(0.85) translateY(18px);
-      transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: none;
-    }
-    .info-panel.visible { opacity: 1; transform: scale(1) translateY(0); }
-
-    #panel-akad    { top: 14%; left: 4%; }
-    #panel-resepsi { top: 14%; right: 4%; }
-    #panel-venue   { top: 42%; left: 50%; transform: translateX(-50%) scale(0.85) translateY(18px); }
-    #panel-venue.visible { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
-    #panel-countdown { bottom: 24%; left: 4%; }
-    #panel-quran   { bottom: 24%; right: 4%; }
+    .panel.show#p-akad    { transform: translateY(0); }
+    .panel.show#p-resepsi { transform: translateY(0); }
+    .panel.show#p-venue   { transform: translateX(-50%) translateY(0); }
+    .panel.show#p-quran   { transform: translateY(0); }
+    .panel.show#p-countdown { transform: translateY(0); }
 
     .panel-inner {
-      background: rgba(10,3,3,0.88);
+      background: rgba(8,2,2,0.82);
       border: 1px solid rgba(192,37,26,0.45);
-      padding: 1.1rem 0.9rem; position: relative; overflow: hidden;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      padding: 1rem 0.85rem;
+      position: relative; overflow: hidden;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
     .panel-inner::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(to right, transparent, var(--red), transparent);
     }
-    .panel-tag {
-      font-family: 'Cinzel Decorative', serif; font-size: 0.38rem;
+    .p-tag {
+      font-family: 'Cinzel Decorative', serif; font-size: 0.36rem;
       letter-spacing: 0.4em; color: var(--red-light);
-      text-transform: uppercase; margin-bottom: 0.5rem; opacity: 0.85;
+      text-transform: uppercase; margin-bottom: 0.4rem; opacity: 0.9;
     }
-    .panel-title {
-      font-family: 'Bodoni Moda', serif; font-size: 0.95rem;
-      font-style: italic; color: var(--cream); margin-bottom: 0.45rem;
+    .p-title {
+      font-family: 'Bodoni Moda', serif; font-size: 0.9rem;
+      font-style: italic; color: var(--cream); margin-bottom: 0.4rem;
     }
-    .panel-body {
-      font-size: 0.68rem; font-weight: 300; line-height: 1.85;
+    .p-body {
+      font-size: 0.65rem; font-weight: 300; line-height: 1.85;
       color: var(--cream); opacity: 0.8;
     }
-    .panel-body strong { color: var(--red-light); font-weight: 400; }
+    .p-body strong { color: var(--red-light); font-weight: 400; }
 
-    .corner { position: absolute; width: 10px; height: 10px; }
-    .c-tl { top: 4px; left: 4px; border-top: 1px solid var(--red); border-left: 1px solid var(--red); }
-    .c-tr { top: 4px; right: 4px; border-top: 1px solid var(--red); border-right: 1px solid var(--red); }
-    .c-bl { bottom: 4px; left: 4px; border-bottom: 1px solid var(--red); border-left: 1px solid var(--red); }
-    .c-br { bottom: 4px; right: 4px; border-bottom: 1px solid var(--red); border-right: 1px solid var(--red); }
+    /* corner ornaments */
+    .co { position: absolute; width: 9px; height: 9px; }
+    .co.tl { top: 4px; left: 4px;   border-top: 1px solid var(--red); border-left:  1px solid var(--red); }
+    .co.tr { top: 4px; right: 4px;  border-top: 1px solid var(--red); border-right: 1px solid var(--red); }
+    .co.bl { bottom: 4px; left: 4px;  border-bottom: 1px solid var(--red); border-left:  1px solid var(--red); }
+    .co.br { bottom: 4px; right: 4px; border-bottom: 1px solid var(--red); border-right: 1px solid var(--red); }
 
-    .countdown-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 0.35rem; margin-top: 0.5rem;
-    }
-    .count-box {
-      background: rgba(192,37,26,0.08);
-      border: 1px solid rgba(192,37,26,0.25);
-      padding: 0.45rem 0.2rem; text-align: center;
-    }
-    .count-num {
-      font-family: 'Bodoni Moda', serif; font-size: 1.1rem;
-      color: var(--red-light); display: block; line-height: 1;
-    }
-    .count-label {
-      font-size: 0.42rem; letter-spacing: 0.18em; color: var(--cream);
-      opacity: 0.45; text-transform: uppercase; display: block; margin-top: 0.18rem;
-    }
+    /* countdown grid */
+    .cd-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.3rem; margin-top: 0.5rem; }
+    .cd-box  { background: rgba(192,37,26,0.09); border: 1px solid rgba(192,37,26,0.25); padding: 0.4rem 0.15rem; text-align: center; }
+    .cd-num  { font-family: 'Bodoni Moda', serif; font-size: 1.05rem; color: var(--red-light); display: block; line-height: 1; }
+    .cd-lbl  { font-size: 0.4rem; letter-spacing: 0.15em; color: var(--cream); opacity: 0.45; text-transform: uppercase; display: block; margin-top: 0.15rem; }
+
+    /* floating animation — subtle up/down */
+    @keyframes float-a { 0%,100%{transform:translateY(0)}    50%{transform:translateY(-6px)} }
+    @keyframes float-b { 0%,100%{transform:translateY(-4px)} 50%{transform:translateY(2px)}  }
+    @keyframes float-c { 0%,100%{transform:translateY(-2px)} 50%{transform:translateY(4px)}  }
+
+    .panel.show#p-akad     { animation: float-a 5s ease-in-out infinite; }
+    .panel.show#p-resepsi  { animation: float-b 6s ease-in-out infinite; }
+    .panel.show#p-quran    { animation: float-c 5.5s ease-in-out infinite; }
+    .panel.show#p-countdown{ animation: float-a 7s ease-in-out infinite; }
+
+    /* staggered reveal delays */
+    #p-akad     { transition-delay: 0s; }
+    #p-resepsi  { transition-delay: 0.2s; }
+    #p-venue    { transition-delay: 0.4s; }
+    #p-quran    { transition-delay: 0.6s; }
+    #p-countdown{ transition-delay: 0.8s; }
 
     /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes bounce {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-10px); }
-    }
-    @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position:  200% center; }
-    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
   </style>
 </head>
 <body>
 
-<!-- CAMERA FEED (live background) -->
+<!-- LIVE CAMERA BACKGROUND -->
 <video id="camera-feed" autoplay playsinline muted></video>
 
-<!-- BACKGROUND AUDIO -->
+<!-- MUSIC -->
 <audio id="bg-music" src="nocturne.mp3" loop preload="auto"></audio>
-
-<!-- MUSIC TOGGLE (shown after AR starts) -->
 <button id="music-toggle" aria-label="Toggle music">♪</button>
 
-<!-- ══════════════════════════════
+<!-- ══════════════════════════
      LANDING SCREEN
-══════════════════════════════ -->
+══════════════════════════ -->
 <div id="landing">
   <div class="top-label">The Wedding of</div>
   <div class="ornament-line"></div>
@@ -343,46 +311,33 @@
     <span style="font-size:0.68rem;opacity:0.6;font-style:normal;letter-spacing:0.15em;color:#e87060;">— QS. Ar-Rum : 21</span>
   </div>
 
-  <div class="ar-instruction">✦ &nbsp; Open your camera &nbsp; ✦<br/>Look around to discover our story</div>
+  <div class="ar-instruction">✦ &nbsp; Point your camera &nbsp; ✦<br/>All our moments will float around you</div>
 
   <button id="start-btn">✦ &nbsp; Begin the Journey &nbsp; ✦</button>
 </div>
 
-<!-- ══════════════════════════════
-     AR OVERLAY UI
-══════════════════════════════ -->
-<div id="ar-overlay">
-  <div class="overlay-top">
-    <div class="guide-title">Abbyan &amp; Nabila</div>
-    <div class="guide-sub">Tilt &amp; move your phone to explore ✦</div>
-  </div>
-
-  <div id="tilt-guide">
-    <div class="tilt-arrow">↑</div>
-    <div class="tilt-text">Look Up to Begin</div>
-  </div>
-
-  <div class="overlay-bottom">
-    <div class="compass">
-      <button class="compass-btn" onclick="showPanel('akad')"><span>🌙</span>Akad</button>
-      <button class="compass-btn" onclick="showPanel('resepsi')"><span>🌹</span>Resepsi</button>
-      <button class="compass-btn" onclick="showPanel('venue')"><span>📍</span>Venue</button>
-      <button class="compass-btn" onclick="showPanel('countdown')"><span>⏳</span>Days</button>
-      <button class="compass-btn" onclick="showPanel('quran')"><span>✦</span>Doa</button>
-    </div>
+<!-- ══════════════════════════
+     AR LAYER (after landing)
+══════════════════════════ -->
+<div id="ar-layer">
+  <div class="ar-top">
+    <div class="ar-names">Abbyan Nur Faizy &amp; Nabila Alifia</div>
+    <div class="ar-hint">Move your phone to feel our world ✦</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════
-     INFO PANELS
-══════════════════════════════ -->
-<div class="info-panel" id="panel-akad">
+<!-- ══════════════════════════
+     FLOATING PANELS (all 5)
+══════════════════════════ -->
+
+<!-- AKAD -->
+<div class="panel" id="p-akad">
   <div class="panel-inner">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="panel-tag">✦ Akad Nikah</div>
-    <div class="panel-title">Sacred Vows</div>
-    <div class="panel-body">
+    <div class="co tl"></div><div class="co tr"></div>
+    <div class="co bl"></div><div class="co br"></div>
+    <div class="p-tag">✦ Akad Nikah</div>
+    <div class="p-title">Sacred Vows</div>
+    <div class="p-body">
       <strong>Saturday, 14 June 2025</strong><br/>
       08.00 – 10.00 WIB<br/><br/>
       Masjid Al-Irsyad<br/>
@@ -392,13 +347,14 @@
   </div>
 </div>
 
-<div class="info-panel" id="panel-resepsi">
+<!-- RESEPSI -->
+<div class="panel" id="p-resepsi">
   <div class="panel-inner">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="panel-tag">✦ Resepsi</div>
-    <div class="panel-title">Celebration</div>
-    <div class="panel-body">
+    <div class="co tl"></div><div class="co tr"></div>
+    <div class="co bl"></div><div class="co br"></div>
+    <div class="p-tag">✦ Resepsi</div>
+    <div class="p-title">Celebration</div>
+    <div class="p-body">
       <strong>Saturday, 14 June 2025</strong><br/>
       11.00 – 15.00 WIB<br/><br/>
       Grand Ballroom<br/>
@@ -408,13 +364,14 @@
   </div>
 </div>
 
-<div class="info-panel" id="panel-venue">
+<!-- VENUE -->
+<div class="panel" id="p-venue">
   <div class="panel-inner">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="panel-tag">✦ Details</div>
-    <div class="panel-title">Dress &amp; RSVP</div>
-    <div class="panel-body">
+    <div class="co tl"></div><div class="co tr"></div>
+    <div class="co bl"></div><div class="co br"></div>
+    <div class="p-tag">✦ Details</div>
+    <div class="p-title">Dress &amp; RSVP</div>
+    <div class="p-body">
       <strong>Dress Code</strong><br/>
       Sage Green &amp; Dusty Gold<br/><br/>
       <strong>RSVP by</strong><br/>
@@ -425,188 +382,109 @@
   </div>
 </div>
 
-<div class="info-panel" id="panel-countdown">
+<!-- QURAN -->
+<div class="panel" id="p-quran">
   <div class="panel-inner">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="panel-tag">✦ Counting Down</div>
-    <div class="panel-title">The Big Day</div>
-    <div class="countdown-grid">
-      <div class="count-box"><span class="count-num" id="cd-days">--</span><span class="count-label">Days</span></div>
-      <div class="count-box"><span class="count-num" id="cd-hours">--</span><span class="count-label">Hours</span></div>
-      <div class="count-box"><span class="count-num" id="cd-mins">--</span><span class="count-label">Mins</span></div>
-      <div class="count-box"><span class="count-num" id="cd-secs">--</span><span class="count-label">Secs</span></div>
+    <div class="co tl"></div><div class="co tr"></div>
+    <div class="co bl"></div><div class="co br"></div>
+    <div class="p-tag">✦ A Blessing</div>
+    <div class="p-title">Our Prayer</div>
+    <div class="p-body" style="font-style:italic;line-height:2;font-size:0.66rem;">
+      "And of His signs is that He created for you from yourselves mates that you may find tranquility in them; and He placed between you affection and mercy."
+      <br/><br/>
+      <span style="font-style:normal;letter-spacing:0.15em;font-size:0.56rem;color:#e87060;">— QS. Ar-Rum : 21</span>
     </div>
   </div>
 </div>
 
-<div class="info-panel" id="panel-quran">
+<!-- COUNTDOWN -->
+<div class="panel" id="p-countdown">
   <div class="panel-inner">
-    <div class="corner c-tl"></div><div class="corner c-tr"></div>
-    <div class="corner c-bl"></div><div class="corner c-br"></div>
-    <div class="panel-tag">✦ A Blessing</div>
-    <div class="panel-title">Our Prayer</div>
-    <div class="panel-body" style="font-style:italic;line-height:2.1;font-size:0.7rem;">
-      "And of His signs is that He created for you from yourselves mates that you may find tranquility in them; and He placed between you affection and mercy."
-      <br/><br/>
-      <span style="font-style:normal;letter-spacing:0.18em;font-size:0.58rem;color:#e87060;">— QS. Ar-Rum : 21</span>
+    <div class="co tl"></div><div class="co tr"></div>
+    <div class="co bl"></div><div class="co br"></div>
+    <div class="p-tag">✦ Counting Down</div>
+    <div class="p-title">The Big Day</div>
+    <div class="cd-grid">
+      <div class="cd-box"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Hrs</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Min</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Sec</span></div>
     </div>
   </div>
 </div>
 
 <script>
-  // ══════════════════════
-  // COUNTDOWN
-  // ══════════════════════
-  const weddingDate = new Date('2025-06-14T08:00:00+07:00');
-  function updateCountdown() {
-    const diff = weddingDate - new Date();
-    if (diff <= 0) {
-      ['days','hours','mins','secs'].forEach(k => document.getElementById('cd-'+k).textContent = '00');
-      return;
-    }
-    document.getElementById('cd-days').textContent  = String(Math.floor(diff / 86400000)).padStart(2,'0');
-    document.getElementById('cd-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
-    document.getElementById('cd-mins').textContent  = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
-    document.getElementById('cd-secs').textContent  = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
+  // ── COUNTDOWN ──
+  const wed = new Date('2025-06-14T08:00:00+07:00');
+  function tick() {
+    const d = wed - Date.now();
+    if (d <= 0) { ['d','h','m','s'].forEach(k => document.getElementById('cd-'+k).textContent='00'); return; }
+    document.getElementById('cd-d').textContent = String(Math.floor(d/86400000)).padStart(2,'0');
+    document.getElementById('cd-h').textContent = String(Math.floor(d%86400000/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(Math.floor(d%3600000/60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(Math.floor(d%60000/1000)).padStart(2,'0');
   }
-  setInterval(updateCountdown, 1000);
-  updateCountdown();
+  setInterval(tick, 1000); tick();
 
-  // ══════════════════════
-  // PANELS
-  // ══════════════════════
-  const allPanels = ['akad','resepsi','venue','countdown','quran'];
-  let activePanel = null;
-
-  function showPanel(name) {
-    allPanels.forEach(p => {
-      const el = document.getElementById('panel-' + p);
-      el.classList.remove('visible');
-      setTimeout(() => { if (!el.classList.contains('visible')) el.style.display = 'none'; }, 560);
-    });
-    document.querySelectorAll('.compass-btn').forEach(b => b.classList.remove('active'));
-
-    if (activePanel === name) { activePanel = null; return; }
-    activePanel = name;
-
-    const target = document.getElementById('panel-' + name);
-    target.style.display = 'block';
-    requestAnimationFrame(() => requestAnimationFrame(() => target.classList.add('visible')));
-
-    const idx = allPanels.indexOf(name);
-    const btns = document.querySelectorAll('.compass-btn');
-    if (btns[idx]) btns[idx].classList.add('active');
-  }
-
-  // ══════════════════════
-  // MUSIC
-  // ══════════════════════
-  const music = document.getElementById('bg-music');
-  const musicBtn = document.getElementById('music-toggle');
+  // ── MUSIC ──
+  const music  = document.getElementById('bg-music');
+  const musBtn = document.getElementById('music-toggle');
   music.volume = 0;
 
-  function fadeInMusic() {
-    music.play().catch(() => {});
-    let vol = 0;
-    const iv = setInterval(() => {
-      vol = Math.min(vol + 0.02, 0.55);
-      music.volume = vol;
-      if (vol >= 0.55) clearInterval(iv);
-    }, 80);
+  function fadeMusic() {
+    music.play().catch(()=>{});
+    let v = 0;
+    const iv = setInterval(()=>{ v = Math.min(v+0.02, 0.5); music.volume = v; if(v>=0.5) clearInterval(iv); }, 80);
   }
-
-  musicBtn.addEventListener('click', () => {
-    if (music.paused) {
-      music.play();
-      musicBtn.textContent = '♪';
-      musicBtn.classList.remove('muted');
-    } else {
-      music.pause();
-      musicBtn.textContent = '♩';
-      musicBtn.classList.add('muted');
-    }
+  musBtn.addEventListener('click', ()=>{
+    if (music.paused) { music.play(); musBtn.textContent='♪'; musBtn.classList.remove('muted'); }
+    else              { music.pause(); musBtn.textContent='♩'; musBtn.classList.add('muted'); }
   });
 
-  // ══════════════════════
-  // CAMERA
-  // ══════════════════════
-  const videoEl = document.getElementById('camera-feed');
-
+  // ── CAMERA ──
   async function startCamera() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: 'environment' }, width:{ideal:1280}, height:{ideal:720} },
         audio: false
       });
-      videoEl.srcObject = stream;
-      videoEl.classList.add('active');
-    } catch (err) {
-      console.warn('Camera not available:', err);
-      // fallback: just show dark background, experience still works
+      document.getElementById('camera-feed').srcObject = stream;
+    } catch(e) {
+      // no camera available — body stays black, experience still works
+      console.warn('Camera unavailable:', e);
     }
   }
 
-  // ══════════════════════
-  // GYROSCOPE
-  // ══════════════════════
-  let lastBeta = 90, gyroLock = false;
-  const panelOrder = ['akad','resepsi','venue','countdown','quran'];
-  let pIdx = 0;
-
-  function initGyro() {
-    window.addEventListener('deviceorientation', e => {
-      if (gyroLock) return;
-      const beta  = e.beta  ?? 90;
-      const gamma = e.gamma ?? 0;
-
-      if (beta < 25 && lastBeta >= 25) {
-        gyroLock = true;
-        showPanel(panelOrder[pIdx++ % panelOrder.length]);
-        setTimeout(() => gyroLock = false, 2200);
-      } else if (gamma < -38) {
-        gyroLock = true;
-        showPanel('akad');
-        setTimeout(() => gyroLock = false, 2200);
-      } else if (gamma > 38) {
-        gyroLock = true;
-        showPanel('resepsi');
-        setTimeout(() => gyroLock = false, 2200);
-      }
-      lastBeta = beta;
-    });
+  // ── SHOW ALL PANELS (staggered) ──
+  function revealPanels() {
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('show'));
   }
 
-  // ══════════════════════
-  // START FLOW
-  // ══════════════════════
-  function startAR() {
-    document.getElementById('landing').classList.add('hidden');
-    document.getElementById('ar-overlay').classList.add('active');
-
-    const tg = document.getElementById('tilt-guide');
-    setTimeout(() => tg.classList.add('hidden'), 3500);
-    setTimeout(() => showPanel('akad'), 2000);
-
-    fadeInMusic();
-    musicBtn.classList.add('visible');
-    initGyro();
-  }
-
-  // Button: Begin the Journey
+  // ── BEGIN BUTTON ──
   document.getElementById('start-btn').addEventListener('click', async () => {
-    // Start camera first (requires user gesture)
-    await startCamera();
-
-    // iOS 13+ needs explicit permission for gyroscope
+    // iOS gyroscope permission
     if (typeof DeviceOrientationEvent !== 'undefined' &&
         typeof DeviceOrientationEvent.requestPermission === 'function') {
-      try {
-        await DeviceOrientationEvent.requestPermission();
-      } catch(e) {}
+      try { await DeviceOrientationEvent.requestPermission(); } catch(e){}
     }
 
-    startAR();
+    // start camera first (needs user gesture)
+    await startCamera();
+
+    // fade out landing (background disappears with it)
+    const landing = document.getElementById('landing');
+    landing.classList.add('gone');
+    setTimeout(() => { landing.style.display = 'none'; }, 900);
+
+    // show AR layer + music toggle
+    document.getElementById('ar-layer').classList.add('active');
+    musBtn.classList.add('show');
+
+    // fade in music
+    fadeMusic();
+
+    // staggered panel reveal
+    setTimeout(revealPanels, 400);
   });
 </script>
 </body>
