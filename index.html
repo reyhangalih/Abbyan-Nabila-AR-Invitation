@@ -223,14 +223,16 @@
       color:var(--cream); opacity:.4; margin-top:.2rem;
     }
 
-    /* tilt hint */
+    /* tilt hint — hidden by default, shows after Begin Journey */
     #hint {
       position:fixed; bottom:2.2rem; left:50%;
       transform:translateX(-50%); z-index:200;
       text-align:center; pointer-events:none;
+      opacity:0; /* hidden by default */
       transition:opacity .8s;
     }
-    #hint.gone { opacity:0; }
+    #hint.visible { opacity:1; }
+    #hint.gone    { opacity:0; }
     .ha { font-size:1.5rem; color:var(--blue); animation:pulse 1.6s ease infinite; }
     .ht {
       font-family:'Playfair Display',serif; font-size:.46rem;
@@ -461,24 +463,25 @@
 <div id="landing">
 
   <!-- Designer's PNG — transparent bg, floats over camera -->
-  <!-- SWAP: replace landing-design.png with transparent version from designer -->
   <img id="landing-img" src="landing-design.png"
     style="
       position:absolute; inset:0;
       width:100%; height:100%;
       object-fit:cover; object-position:top;
       pointer-events:none;
+      image-rendering:-webkit-optimize-contrast;
+      image-rendering:crisp-edges;
     "
   />
 
-  <!-- Coded button — positioned exactly where designer placed it -->
-  <!-- Position matches the PNG: bottom 18% of screen -->
+  <!-- Begin The Journey button — sits at very bottom matching "move to explore" position -->
   <div style="
     position:absolute;
-    bottom:18%;
+    bottom:7%;
     left:50%; transform:translateX(-50%);
     width:100%;
     display:flex; justify-content:center;
+    z-index:10;
   ">
     <button id="btn">
       Begin The Journey
@@ -500,7 +503,7 @@
   </div>
 </div>
 
-<!-- tilt hint -->
+<!-- tilt hint — only shown after Begin Journey -->
 <div id="hint">
   <div class="ha">↕ ↔</div>
   <div class="ht">Move to explore</div>
@@ -773,8 +776,15 @@ document.getElementById('btn').addEventListener('click', function(){
       });
     }, 300);
 
-    /* Hide tilt hint after 7s */
-    setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 7000);
+    /* Show tilt hint after all panels are visible, then fade out after 5s */
+    setTimeout(()=>{
+      const hint = document.getElementById('hint');
+      hint.classList.add('visible');
+      setTimeout(()=>{
+        hint.classList.remove('visible');
+        hint.classList.add('gone');
+      }, 5000);
+    }, 2500);
 
   }, 1800);
 });
