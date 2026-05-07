@@ -308,6 +308,21 @@
   <!-- Edge vignette -->
   <div id="landing-vignette"></div>
 
+  <!-- Designer PNG — transparent bg, floats over camera -->
+  <img id="landing-img" src="landing-design.png"
+    style="
+      position:absolute;
+      top:0; left:50%;
+      transform:translateX(-50%);
+      width:auto; height:100%;
+      max-width:100%;
+      pointer-events:none;
+      z-index:2;
+      image-rendering:-webkit-optimize-contrast;
+      image-rendering:crisp-edges;
+    "
+  />
+
   <!-- Pulsing rings -->
   <div class="m-ring" style="width:min(380px,90vw);height:min(380px,90vw);animation:pulse-ring 6s ease-in-out infinite;"></div>
   <div class="m-ring" style="width:min(270px,65vw);height:min(270px,65vw);animation:pulse-ring 6s ease-in-out 1.2s infinite;"></div>
