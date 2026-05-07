@@ -98,78 +98,21 @@
         transparent 30%, rgba(0,0,0,.6) 100%);
     }
 
-    /* Motion graphic text stack */
-    .motion-text {
-      position:absolute; inset:0; z-index:10;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      pointer-events:none;
-    }
-    .m-lbl {
-      font-family:'Jost',sans-serif; font-weight:200;
-      font-size:clamp(.55rem,2.5vw,.72rem); letter-spacing:.55em;
-      color:var(--blue-light); text-transform:uppercase;
-      opacity:0; animation:fadeUp 1.2s ease .3s forwards;
-      text-shadow:0 1px 14px rgba(0,0,0,.98);
-    }
-    .m-names {
-      font-family:'Great Vibes',cursive;
-      font-size:clamp(3.2rem,18vw,6rem);
-      color:var(--cream); line-height:1.05;
-      opacity:0; animation:fadeUp 1.4s ease .6s forwards;
-      text-shadow:0 0 35px rgba(107,127,212,.55), 0 2px 14px rgba(0,0,0,.99);
-    }
-    .m-divider {
-      display:flex; align-items:center; gap:10px; margin:6px 0;
-      opacity:0; animation:fadeUp 1s ease 1s forwards;
-    }
-    .m-div-line { width:48px; height:.5px; background:rgba(107,127,212,.6); }
-    .m-div-dia  { width:5px; height:5px; background:var(--blue); transform:rotate(45deg); }
-    .m-date {
-      font-family:'Jost',sans-serif; font-weight:200;
-      font-size:clamp(.55rem,2.2vw,.7rem); letter-spacing:.35em;
-      color:var(--cream-dim); text-transform:uppercase;
-      opacity:0; animation:fadeUp 1s ease 1.2s forwards;
-      text-shadow:0 1px 12px rgba(0,0,0,.99);
-    }
-    .m-verse {
-      font-family:'Playfair Display',serif; font-style:italic;
-      font-size:clamp(.55rem,2.2vw,.7rem); color:rgba(200,184,154,.7);
-      letter-spacing:.06em; margin-top:14px;
-      max-width:200px; text-align:center; line-height:1.9;
-      opacity:0; animation:fadeUp 1s ease 1.6s forwards;
-      text-shadow:0 1px 10px rgba(0,0,0,.99);
-    }
-
-    /* Corner ornaments */
-    .orn { position:absolute; z-index:11; opacity:0; animation:fadeIn .8s ease 2s forwards; }
-    .orn-tl { top:16px; left:16px; }
-    .orn-tr { top:16px; right:16px; transform:scaleX(-1); }
-    .orn-bl { bottom:80px; left:16px; transform:scaleY(-1); }
-    .orn-br { bottom:80px; right:16px; transform:scale(-1,-1); }
-
-    /* Pulsing rings */
-    .m-ring {
-      position:absolute; border-radius:50%;
-      border:1px solid rgba(107,127,212,.15);
-      z-index:3; pointer-events:none;
-      left:50%; top:46%; transform:translate(-50%,-50%);
-    }
-
     /* Begin The Journey button */
     #btn {
-      position:absolute; bottom:7%; left:50%; transform:translateX(-50%);
+      position:absolute; bottom:7%;
+      left:50%; transform:translateX(-50%);
       z-index:12;
-      display:flex; align-items:center; gap:.8rem;
+      display:inline-flex; align-items:center; gap:.8rem;
       background:transparent; border:2px solid var(--blue);
       border-radius:999px; color:var(--blue);
       font-family:'Jost',sans-serif;
-      font-size:clamp(.7rem,3vw,.9rem);
+      font-size:.85rem;
       font-weight:300; letter-spacing:.12em;
       padding:.75rem 1.5rem .75rem 2rem;
       cursor:pointer; transition:all .35s;
-      white-space:nowrap;
-      opacity:0; animation:fadeUp 1s ease 2.2s forwards;
+      white-space:nowrap; width:max-content;
+      opacity:0; animation:fadeUp 1s ease 1s forwards;
       -webkit-tap-highlight-color:transparent;
     }
     #btn:active, #btn:hover { background:var(--blue); color:#fff; }
