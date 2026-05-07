@@ -652,7 +652,7 @@ setInterval(tick,1000); tick();
 /* ── MUSIC ── */
 const bgm = document.getElementById('bgm');
 const musBtn = document.getElementById('mus');
-bgm.volume = 0;
+bgm.volume = 50;
 let audioUnlocked = false;
 
 /* Unlock audio context on first user gesture (iOS requirement) */
@@ -666,7 +666,7 @@ function unlockAudio(){
 }
 
 function fadeMusic(){
-  bgm.volume = 0;
+  bgm.volume = 50;
   bgm.play().catch(()=>{});
   let v = 0;
   const iv = setInterval(()=>{
