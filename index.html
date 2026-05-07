@@ -377,26 +377,41 @@
     ══════════════════════════════ */
     #landing {
       position:fixed; inset:0; z-index:900;
-      display:none; /* hidden until camera allowed */
-      flex-direction:column;
-      align-items:center; justify-content:flex-start;
-      text-align:center; padding:0;
-      background: rgba(0,0,0,0.45);
+      display:none;
+      align-items:center; justify-content:center;
+      background: transparent;
       overflow:hidden;
       opacity:0;
       transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    /* shown after permission — fade in */
-    #landing.show {
-      display:flex;
-      opacity:1;
-      background: transparent;
+    #landing.show { display:flex; opacity:1; }
+    #landing.out  { opacity:0; pointer-events:none; }
+
+    /* Begin The Journey pill button — matches designer's style */
+    #btn {
+      display:flex; align-items:center; gap:.8rem;
+      background:transparent;
+      border:2px solid var(--blue);
+      border-radius:999px;
+      color:var(--blue);
+      font-family:'Jost',sans-serif;
+      font-size:clamp(.75rem,3vw,.95rem);
+      font-weight:300; letter-spacing:.12em;
+      padding:.75rem 1.5rem .75rem 2rem;
+      cursor:pointer; transition:all .35s;
+      -webkit-tap-highlight-color:transparent;
+      white-space:nowrap;
     }
-    /* fade out on Begin Journey */
-    #landing.out {
-      opacity:0;
-      pointer-events:none;
+    #btn:active,#btn:hover { background:var(--blue); color:#fff; }
+    .btn-play {
+      width:32px; height:32px;
+      border-radius:50%; background:var(--blue);
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; transition:background .35s;
     }
+    #btn:active .btn-play,#btn:hover .btn-play { background:#fff; }
+    .btn-play svg { fill:#fff; width:38%; height:38%; margin-left:8%; }
+    #btn:active .btn-play svg,#btn:hover .btn-play svg { fill:var(--blue); }
 
     /* float animations — gentle, slow */
     @keyframes fl1{0%,100%{transform:translateY(0px)}   50%{transform:translateY(-8px)}}
@@ -445,99 +460,33 @@
 ══════════════════ -->
 <div id="landing">
 
-  <!-- Top ornament SVG — matches Canva scroll/flourish -->
-  <svg class="ornament-top" viewBox="0 0 400 55" xmlns="http://www.w3.org/2000/svg" fill="none">
-    <g stroke="#e8dcc8" stroke-width="1.3" opacity="0.8" stroke-linecap="round">
-      <!-- left scroll -->
-      <path d="M8,28 C20,10 40,8 52,20 C60,28 55,40 45,36 C35,32 38,22 48,24"/>
-      <path d="M4,32 C18,6 44,4 58,18 C68,28 62,44 50,40"/>
-      <!-- left wave to centre -->
-      <path d="M55,26 C80,12 110,18 140,22 C160,24 175,20 190,18"/>
-      <path d="M55,30 C82,16 112,22 142,26 C162,28 177,24 192,22"/>
-      <!-- right scroll (mirror) -->
-      <path d="M392,28 C380,10 360,8 348,20 C340,28 345,40 355,36 C365,32 362,22 352,24"/>
-      <path d="M396,32 C382,6 356,4 342,18 C332,28 338,44 350,40"/>
-      <!-- right wave to centre -->
-      <path d="M345,26 C320,12 290,18 260,22 C240,24 225,20 210,18"/>
-      <path d="M345,30 C318,16 288,22 258,26 C238,28 223,24 208,22"/>
-      <!-- centre crown peak -->
-      <path d="M190,18 C194,8 197,4 200,6 C203,4 206,8 210,18"/>
-      <path d="M192,22 C196,10 199,6 200,8 C201,6 204,10 208,22"/>
-      <!-- centre dots -->
-      <circle cx="200" cy="5" r="2" fill="#e8dcc8" stroke="none"/>
-      <circle cx="193" cy="14" r="1.3" fill="#e8dcc8" stroke="none"/>
-      <circle cx="207" cy="14" r="1.3" fill="#e8dcc8" stroke="none"/>
-    </g>
-  </svg>
+  <!-- Designer's PNG — transparent bg, floats over camera -->
+  <!-- SWAP: replace landing-design.png with transparent version from designer -->
+  <img id="landing-img" src="landing-design.png"
+    style="
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:top;
+      pointer-events:none;
+    "
+  />
 
-  <!-- "The Wedding Of" — Playfair Display -->
-  <div class="lbl">The Wedding Of</div>
-
-  <!-- Big stacked names + swash ampersand -->
-  <div class="names-block">
-    <span class="big-name">ABBYAN</span>
-    <span class="big-name">NABILA</span>
-    <span class="big-amp">&amp;</span>
+  <!-- Coded button — positioned exactly where designer placed it -->
+  <!-- Position matches the PNG: bottom 18% of screen -->
+  <div style="
+    position:absolute;
+    bottom:18%;
+    left:50%; transform:translateX(-50%);
+    width:100%;
+    display:flex; justify-content:center;
+  ">
+    <button id="btn">
+      Begin The Journey
+      <span class="btn-play">
+        <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
+      </span>
+    </button>
   </div>
-
-  <!-- Date — Pinyon Script -->
-  <div class="date-script">Saturday, June 14<sup>th</sup> 2026</div>
-
-  <!-- Ornate frame with Quran verse (white bg, black border) -->
-  <div class="verse-frame">
-    <!-- Ornate double-border frame SVG -->
-    <svg class="frame-svg" viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg">
-      <!-- transparent fill — no white background -->
-      <rect x="4" y="4" width="332" height="122" rx="18" ry="18" fill="transparent"/>
-      <!-- outer ornate border -->
-      <rect x="4" y="4" width="332" height="122" rx="18" ry="18"
-        fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.8"/>
-      <!-- inner border -->
-      <rect x="12" y="12" width="316" height="106" rx="13" ry="13"
-        fill="none" stroke="rgba(232,220,200,0.6)" stroke-width="1"/>
-      <!-- corner flourishes TL -->
-      <path d="M4,22 Q4,4 22,4" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
-      <path d="M8,24 Q8,8 24,8" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
-      <!-- corner flourishes TR -->
-      <path d="M318,4 Q336,4 336,22" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
-      <path d="M316,8 Q332,8 332,24" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
-      <!-- corner flourishes BL -->
-      <path d="M4,108 Q4,126 22,126" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
-      <path d="M8,106 Q8,122 24,122" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
-      <!-- corner flourishes BR -->
-      <path d="M318,126 Q336,126 336,108" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
-      <path d="M316,122 Q332,122 332,106" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
-      <!-- top centre ornament -->
-      <path d="M155,4 Q170,0 185,4" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1"/>
-      <path d="M160,8 Q170,5 180,8" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".7"/>
-      <!-- bottom centre ornament -->
-      <path d="M155,126 Q170,130 185,126" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1"/>
-      <path d="M160,122 Q170,125 180,122" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".7"/>
-    </svg>
-    <!-- Text layered on top of frame SVG -->
-    <div class="verse-text">
-      <div class="verse-quote">"And He placed between you affection &amp; mercy"</div>
-      <div class="verse-ref">– Ar Rum: 21</div>
-    </div>
-  </div>
-
-  <!-- "Point your camera / Tilt to find..." -->
-  <div class="cam-hint">
-    <div class="dots">
-      <span class="dot"></span>
-      <span class="point-text">Point Your Camera</span>
-      <span class="dot"></span>
-    </div>
-    <div class="tilt-text">Tilt To Find Our Moments Around You</div>
-  </div>
-
-  <!-- Begin The Journey pill button -->
-  <button id="btn">
-    Begin The Journey
-    <span class="btn-play">
-      <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
-    </span>
-  </button>
 
 </div>
 
