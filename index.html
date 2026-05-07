@@ -36,10 +36,8 @@
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
       text-align:center; padding:2.5rem 2rem;
-      background:
-        radial-gradient(ellipse at 22% 12%, #2e0b0b 0%, transparent 52%),
-        radial-gradient(ellipse at 78% 88%, #1c0606 0%, transparent 52%),
-        #100808;
+      /* semi-transparent so camera feed shows through behind it */
+      background: rgba(10, 3, 3, 0.82);
       transition: opacity .7s ease;
     }
     /* hidden = invisible but still in DOM briefly */
@@ -487,11 +485,11 @@ async function startCam(){
 ══════════════════════════════════════════ */
 
 const ANCHORS = {
-  pa: { ax: -1.8, ay:  0   },  // Akad:      far LEFT
-  pr: { ax:  1.8, ay:  0   },  // Resepsi:   far RIGHT
-  pv: { ax:  0,   ay: -1.8 },  // Venue:     far UP
-  pq: { ax: -1.2, ay:  1.8 },  // Quran:     DOWN-LEFT
-  pc: { ax:  1.2, ay:  1.8 },  // Countdown: DOWN-RIGHT
+  pa: { ax: -0.7, ay:  0   },  // Akad:      LEFT (small tilt)
+  pr: { ax:  0.7, ay:  0   },  // Resepsi:   RIGHT
+  pv: { ax:  0,   ay: -0.7 },  // Venue:     UP
+  pq: { ax: -0.6, ay:  0.7 },  // Quran:     DOWN-LEFT
+  pc: { ax:  0.6, ay:  0.7 },  // Countdown: DOWN-RIGHT
 };
 
 let smoothG=0, smoothB=90, gyroStarted=false;
@@ -506,19 +504,14 @@ function applyGyro(gamma, beta){
     Tilt forward (beta<90) = looking UP → panels that are "up" come into view
     Tilt back (beta>90) = looking DOWN → panels that are "down" come into view
   */
-  const gFactor = Math.max(-1, Math.min(1, gamma / 45));       // -1..1 left-right
-  const bFactor = Math.max(-1, Math.min(1, (beta-90) / 45));   // -1..1 up-down (neg=up)
+  const gFactor = Math.max(-1, Math.min(1, gamma / 30));       // -1..1 left-right (30° max)
+  const bFactor = Math.max(-1, Math.min(1, (beta-90) / 30));   // -1..1 up-down
 
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el)return;
-    /*
-      Panel's visual X = anchor_x * screenW - gyro_x_contribution
-      When gFactor=-1 (tilt left), panels with ax=-1.8 → tx ≈ 0 → visible
-      When gFactor=+1 (tilt right), panels with ax=+1.8 → tx ≈ 0 → visible
-    */
-    const tx = (ax + gFactor * 1.8) * W * 0.5;
-    const ty = (ay + bFactor * 1.8) * H * 0.5;
+    const tx = (ax + gFactor * 0.7) * W * 0.5;
+    const ty = (ay + bFactor * 0.7) * H * 0.5;
     el.style.transform = `translate(${tx}px, ${ty}px)`;
   });
 }
@@ -543,6 +536,9 @@ function initGyro(){
   },2500);
 }
 
+/* ── START CAMERA ON PAGE LOAD (before button click) ── */
+startCam();
+
 /* ── START BUTTON ── */
 document.getElementById('btn').addEventListener('click', async()=>{
   /* iOS gyro permission (must happen on user gesture) */
@@ -550,9 +546,6 @@ document.getElementById('btn').addEventListener('click', async()=>{
      typeof DeviceOrientationEvent.requestPermission==='function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
-
-  /* start camera feed */
-  await startCam();
 
   /* IMMEDIATELY remove landing — display:none, no delay */
   const land=document.getElementById('landing');
