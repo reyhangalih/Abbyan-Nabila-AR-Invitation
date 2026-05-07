@@ -1,22 +1,11 @@
 {
   "version": 2,
-  "name": "abbyan-nabila-wedding",
-  "builds": [
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.png",  "use": "@vercel/static" },
-    { "src": "*.jpeg", "use": "@vercel/static" },
-    { "src": "*.jpg",  "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/$1" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Cross-Origin-Opener-Policy",   "value": "same-origin" },
-        { "key": "Cross-Origin-Embedder-Policy",  "value": "require-corp" },
-        { "key": "Permissions-Policy",            "value": "camera=*, gyroscope=*, accelerometer=*" }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Permissions-Policy", "value": "camera=*, gyroscope=*, accelerometer=*" }
       ]
     }
   ]
