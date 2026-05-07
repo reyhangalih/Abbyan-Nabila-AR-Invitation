@@ -41,7 +41,8 @@
       display:flex; flex-direction:column;
       align-items:center; justify-content:flex-start;
       text-align:center; padding:0;
-      background:#080808;
+      /* subtle dark overlay only — camera shows through */
+      background: rgba(0,0,0,0.45);
       transition:opacity .7s ease;
       overflow:hidden;
     }
@@ -51,8 +52,9 @@
     .ornament-top {
       width:85%; max-width:340px;
       margin-top:clamp(1.8rem,6vw,3rem);
-      opacity:.8;
+      opacity:.9;
       animation:up 1s ease both;
+      filter: drop-shadow(0 1px 6px rgba(0,0,0,0.8));
     }
 
     /* "The Wedding Of" — Playfair Display bold, blue */
@@ -63,6 +65,7 @@
       letter-spacing:.03em;
       margin-top:clamp(.5rem,2vw,.9rem);
       animation:up 1s ease .1s both;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.9);
     }
 
     /* ABBYAN / NABILA — Bebas Neue (TAN Harmoni substitute) */
@@ -82,6 +85,7 @@
       letter-spacing:.02em;
       text-transform:uppercase;
       line-height:.9;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
     }
     /* Big swash & — Great Vibes (ITC Edwardian Script substitute) */
     .big-amp {
@@ -92,6 +96,7 @@
       font-size:clamp(4rem,19vw,7.5rem);
       font-weight:400; color:var(--blue);
       line-height:1; pointer-events:none;
+      text-shadow: 0 2px 15px rgba(0,0,0,0.9);
     }
 
     /* date — Pinyon Script (Snell Roundhand substitute) */
@@ -102,6 +107,7 @@
       margin-top:clamp(.2rem,1.5vw,.5rem);
       animation:up 1s ease .3s both;
       line-height:1.3;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.9);
     }
     .date-script sup {
       font-size:.55em; vertical-align:super;
@@ -126,12 +132,14 @@
     .verse-quote {
       font-family:'Playfair Display',serif;
       font-style:italic; font-size:clamp(.65rem,2.8vw,.85rem);
-      color:#111; line-height:1.7;
+      color:var(--cream); line-height:1.7;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.8);
     }
     .verse-ref {
       font-family:'Playfair Display',serif;
       font-style:italic; font-size:clamp(.6rem,2.5vw,.75rem);
-      color:#444; margin-top:.4rem;
+      color:var(--cream-dim); margin-top:.4rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.95);
     }
 
     /* "POINT YOUR CAMERA" instruction below frame */
@@ -145,19 +153,21 @@
     }
     .cam-hint .dot {
       width:6px; height:6px; border-radius:50%;
-      border:1px solid #c0251a;
+      border:1px solid var(--blue-light);
     }
     .cam-hint .point-text {
       font-family:'Jost',sans-serif; font-weight:700;
       font-size:clamp(.55rem,2.2vw,.7rem);
-      letter-spacing:.35em; color:#111;
+      letter-spacing:.35em; color:var(--cream);
       text-transform:uppercase;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
     }
     .cam-hint .tilt-text {
       font-family:'Jost',sans-serif; font-weight:400;
       font-size:clamp(.55rem,2.2vw,.7rem);
-      letter-spacing:.25em; color:#111;
+      letter-spacing:.25em; color:var(--cream);
       text-transform:uppercase; margin-top:.15rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
     }
 
     /* Begin The Journey pill button */
@@ -370,11 +380,12 @@
       animation: up 1s ease .4s both;
     }
 
-    /* landing hidden by default, shown after permission */
     #landing { display:none; }
     #landing.show {
       display:flex;
       animation: up .8s ease both;
+      /* transparent — camera video shows through from behind */
+      background: transparent !important;
     }
 
     /* float animations */
@@ -464,32 +475,32 @@
   <div class="verse-frame">
     <!-- Ornate double-border frame SVG -->
     <svg class="frame-svg" viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg">
-      <!-- white fill background -->
-      <rect x="4" y="4" width="332" height="122" rx="18" ry="18" fill="white"/>
+      <!-- transparent fill — no white background -->
+      <rect x="4" y="4" width="332" height="122" rx="18" ry="18" fill="transparent"/>
       <!-- outer ornate border -->
       <rect x="4" y="4" width="332" height="122" rx="18" ry="18"
-        fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+        fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.8"/>
       <!-- inner border -->
       <rect x="12" y="12" width="316" height="106" rx="13" ry="13"
-        fill="none" stroke="#1a1a1a" stroke-width="1"/>
+        fill="none" stroke="rgba(232,220,200,0.6)" stroke-width="1"/>
       <!-- corner flourishes TL -->
-      <path d="M4,22 Q4,4 22,4" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-      <path d="M8,24 Q8,8 24,8" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <path d="M4,22 Q4,4 22,4" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
+      <path d="M8,24 Q8,8 24,8" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
       <!-- corner flourishes TR -->
-      <path d="M318,4 Q336,4 336,22" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-      <path d="M316,8 Q332,8 332,24" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <path d="M318,4 Q336,4 336,22" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
+      <path d="M316,8 Q332,8 332,24" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
       <!-- corner flourishes BL -->
-      <path d="M4,108 Q4,126 22,126" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-      <path d="M8,106 Q8,122 24,122" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <path d="M4,108 Q4,126 22,126" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
+      <path d="M8,106 Q8,122 24,122" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
       <!-- corner flourishes BR -->
-      <path d="M318,126 Q336,126 336,108" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-      <path d="M316,122 Q332,122 332,106" fill="none" stroke="#1a1a1a" stroke-width=".8"/>
+      <path d="M318,126 Q336,126 336,108" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1.5"/>
+      <path d="M316,122 Q332,122 332,106" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".8"/>
       <!-- top centre ornament -->
-      <path d="M155,4 Q170,0 185,4" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-      <path d="M160,8 Q170,5 180,8" fill="none" stroke="#1a1a1a" stroke-width=".7"/>
+      <path d="M155,4 Q170,0 185,4" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1"/>
+      <path d="M160,8 Q170,5 180,8" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".7"/>
       <!-- bottom centre ornament -->
-      <path d="M155,126 Q170,130 185,126" fill="none" stroke="#1a1a1a" stroke-width="1"/>
-      <path d="M160,122 Q170,125 180,122" fill="none" stroke="#1a1a1a" stroke-width=".7"/>
+      <path d="M155,126 Q170,130 185,126" fill="none" stroke="rgba(232,220,200,0.85)" stroke-width="1"/>
+      <path d="M160,122 Q170,125 180,122" fill="none" stroke="rgba(232,220,200,0.6)" stroke-width=".7"/>
     </svg>
     <!-- Text layered on top of frame SVG -->
     <div class="verse-text">
