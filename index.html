@@ -239,32 +239,27 @@
       text-shadow:0 1px 10px #000;
     }
 
-    /* panel hidden by default — starts below + invisible */
+    /* ══════════════════════════════
+       PANELS — invisible by default
+       gyro positions them, opacity reveals them
+    ══════════════════════════════ */
     .panel {
       position:fixed; z-index:300;
       width:175px;
       opacity:0;
       pointer-events:none;
-      transform: translateY(24px);
-      /* smooth transition for both opacity AND gyro transform */
-      transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+      /* only animate opacity — transform is handled entirely by gyro JS */
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
       will-change: transform, opacity;
     }
+    .panel.on { pointer-events:auto; }
 
-    /* when .on is added — panel fades + rises into position */
-    .panel.on {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    /* staggered delay per panel so they appear one by one */
-    #pa { top:10%;  left:4%;              transition-delay: 0s;   }
-    #pr { top:10%;  right:4%;             transition-delay: 0.3s; }
-    #pv { top:35%;  left:50%; margin-left:-87px; transition-delay: 0.6s; }
-    #pq { bottom:20%; left:4%;            transition-delay: 0.9s; }
-    #pc { bottom:20%; right:4%;           transition-delay: 1.2s; }
+    /* staggered opacity reveal */
+    #pa { top:10%;  left:4%;                      transition-delay: 0s;   }
+    #pr { top:10%;  right:4%;                     transition-delay: 0.4s; }
+    #pv { top:35%;  left:50%; margin-left:-87px;  transition-delay: 0.8s; }
+    #pq { bottom:20%; left:4%;                    transition-delay: 1.2s; }
+    #pc { bottom:20%; right:4%;                   transition-delay: 1.6s; }
 
     /* panel inner — NO background, pure transparent */
     .pi {
@@ -371,30 +366,30 @@
       animation: up 1s ease .4s both;
     }
 
-    /* landing — smooth long fade out */
+    /* ══════════════════════════════
+       LANDING
+    ══════════════════════════════ */
     #landing {
       position:fixed; inset:0; z-index:900;
-      display:flex; flex-direction:column;
+      display:none; /* hidden until camera allowed */
+      flex-direction:column;
       align-items:center; justify-content:flex-start;
       text-align:center; padding:0;
       background: rgba(0,0,0,0.45);
-      /* slow, cinematic fade out */
-      transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  visibility 1.5s;
       overflow:hidden;
-    }
-    #landing.out {
       opacity:0;
-      visibility:hidden;
-      pointer-events:none;
+      transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    /* landing hidden by default, shown after permission */
-    #landing { display:none; }
+    /* shown after permission — fade in */
     #landing.show {
       display:flex;
-      animation: fadeIn 1s ease both;
-      background: transparent !important;
+      opacity:1;
+      background: transparent;
+    }
+    /* fade out on Begin Journey */
+    #landing.out {
+      opacity:0;
+      pointer-events:none;
     }
 
     /* float animations — gentle, slow */
@@ -712,27 +707,45 @@ function applyGyro(g, b){
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el) return;
-    /* smooth gyro movement — override the entry transition with a faster one */
-    el.style.transition = 'opacity 1s ease, transform 0.3s ease-out';
-    el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
+    /* fast smooth gyro response */
+    el.style.transition = 'opacity 1.2s ease, transform 0.25s ease-out';
+    el.style.transform = `translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
   });
 }
 
 function initGyro(){
-  let hasGyro=false;
-  window.addEventListener('deviceorientation', e=>{
-    if(e.gamma===null && e.beta===null) return;
-    hasGyro=true;
-    sG += (e.gamma-sG)*0.1;
-    sB += (e.beta-sB)*0.1;
-    applyGyro(sG, sB);
+  /* immediately position all panels off-screen based on their anchors */
+  const W=window.innerWidth, H=window.innerHeight;
+  Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.style.transition = 'none'; /* instant — no animation on initial position */
+    el.style.transform = `translate(${ax*W*0.5}px,${ay*H*0.5}px)`;
   });
+
+  let hasGyro=false;
+  /* small delay before listening so initial position is set */
   setTimeout(()=>{
-    if(!hasGyro) Object.keys(ANCHORS).forEach(id=>{
-      const el=document.getElementById(id);
-      if(el) el.style.transform='translate(0,0)';
+    window.addEventListener('deviceorientation', e=>{
+      if(e.gamma===null && e.beta===null) return;
+      hasGyro=true;
+      sG += (e.gamma-sG)*0.1;
+      sB += (e.beta-sB)*0.1;
+      applyGyro(sG, sB);
     });
-  }, 2500);
+    setTimeout(()=>{
+      if(!hasGyro){
+        /* no gyro — show all panels centred */
+        Object.entries(ANCHORS).forEach(([id])=>{
+          const el=document.getElementById(id);
+          if(el){
+            el.style.transition = 'opacity 1.2s ease, transform 0.8s ease';
+            el.style.transform='translate(0,0)';
+          }
+        });
+      }
+    }, 2500);
+  }, 100);
 }
 
 /* ══════════════════════════════
@@ -765,25 +778,42 @@ document.getElementById('perm-btn').addEventListener('click', async function(){
 ══════════════════════════════ */
 document.getElementById('btn').addEventListener('click', function(){
 
-  /* START MUSIC — synchronous, first line, no awaits before this */
+  /* START MUSIC — synchronous first line */
   startMusic();
 
-  /* Fade out landing — slow cinematic */
+  /* Fade out landing slowly */
   const land = document.getElementById('landing');
   land.classList.add('out');
-  setTimeout(()=>{ land.style.display='none'; }, 1600);
 
-  /* Show AR layer */
-  document.getElementById('ar-ui').classList.add('on');
+  /* Wait for landing to fully fade THEN reveal everything */
+  setTimeout(()=>{
+    land.style.display = 'none';
 
-  /* Reveal panels one by one (CSS stagger handles timing) */
-  document.querySelectorAll('.panel').forEach(p => p.classList.add('on'));
+    /* Show AR layer */
+    document.getElementById('ar-ui').classList.add('on');
 
-  /* Start gyro AFTER all panels have appeared (1.2s + 0.9s longest delay + 1s transition) */
-  setTimeout(()=>{ initGyro(); }, 2400);
+    /* Init gyro FIRST — pre-positions panels off-screen via transform */
+    initGyro();
 
-  /* Hide tilt hint after 6s */
-  setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 6000);
+    /* Small delay then reveal panels one by one via CSS stagger */
+    setTimeout(()=>{
+      document.querySelectorAll('.panel').forEach(p => {
+        p.style.opacity = '1';
+      });
+      /* stagger opacity manually */
+      const panels = ['pa','pr','pv','pq','pc'];
+      panels.forEach((id, i) => {
+        setTimeout(()=>{
+          const el = document.getElementById(id);
+          if(el) el.classList.add('on');
+        }, i * 400);
+      });
+    }, 300);
+
+    /* Hide tilt hint after 7s */
+    setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 7000);
+
+  }, 1800);
 });
 </script>
 </body>
