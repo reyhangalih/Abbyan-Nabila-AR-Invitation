@@ -6,12 +6,6 @@
   <title>Abbyan & Nabila</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Bebas+Neue&family=Great+Vibes&family=Pinyon+Script&family=Jost:wght@200;300;400&display=swap');
-    /*
-      TAN Harmoni  → Bebas Neue  (ultra-condensed bold display)
-      ITC Edwardian Script → Great Vibes (elegant swash script)
-      Snell Roundhand → Pinyon Script (roundhand italic script)
-      Playfair Display → Playfair Display ✓ exact
-    */
 
     :root {
       --blue:      #6b7fd4;
@@ -25,306 +19,25 @@
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html, body { width:100%; height:100%; overflow:hidden; background:#000; }
 
-    /* ══════════════════════════════
-       CAMERA — always fullscreen z=0
-    ══════════════════════════════ */
+    /* ── CAMERA ── */
     #cam {
       position:fixed; inset:0; z-index:0;
       width:100%; height:100%; object-fit:cover;
     }
 
     /* ══════════════════════════════
-       LANDING
+       MOTION GRAPHIC CANVAS
+       Sits above camera, fully transparent bg
     ══════════════════════════════ */
-    #landing {
-      position:fixed; inset:0; z-index:900;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:flex-start;
-      text-align:center; padding:0;
-      /* subtle dark overlay only — camera shows through */
-      background: rgba(0,0,0,0.45);
-      transition:opacity .7s ease;
-      overflow:hidden;
-    }
-    #landing.out { opacity:0; pointer-events:none; }
-
-    /* top ornament */
-    .ornament-top {
-      width:85%; max-width:340px;
-      margin-top:clamp(1.8rem,6vw,3rem);
-      opacity:.9;
-      animation:up 1s ease both;
-      filter: drop-shadow(0 1px 6px rgba(0,0,0,0.8));
-    }
-
-    /* "The Wedding Of" — Playfair Display bold, blue */
-    .lbl {
-      font-family:'Playfair Display',serif;
-      font-size:clamp(1rem,4.5vw,1.3rem);
-      font-weight:700; color:var(--blue);
-      letter-spacing:.03em;
-      margin-top:clamp(.5rem,2vw,.9rem);
-      animation:up 1s ease .1s both;
-      text-shadow: 0 1px 10px rgba(0,0,0,0.9);
-    }
-
-    /* ABBYAN / NABILA — Bebas Neue (TAN Harmoni substitute) */
-    .names-block {
-      position:relative;
-      margin-top:clamp(.1rem,1vw,.3rem);
-      line-height:.85;
-      padding-right:clamp(2.5rem,10vw,4rem); /* space for ampersand */
-      animation:up 1s ease .2s both;
-    }
-    .big-name {
-      display:block;
-      font-family:'Bebas Neue',sans-serif;
-      font-size:clamp(4.5rem,22vw,8rem);
-      font-weight:400;
-      color:var(--cream);
-      letter-spacing:.02em;
-      text-transform:uppercase;
-      line-height:.9;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.7);
-    }
-    /* Big swash & — Great Vibes (ITC Edwardian Script substitute) */
-    .big-amp {
-      position:absolute;
-      right:clamp(-1rem,-1vw,-.5rem);
-      top:48%; transform:translateY(-50%);
-      font-family:'Great Vibes',cursive;
-      font-size:clamp(4rem,19vw,7.5rem);
-      font-weight:400; color:var(--blue);
-      line-height:1; pointer-events:none;
-      text-shadow: 0 2px 15px rgba(0,0,0,0.9);
-    }
-
-    /* date — Pinyon Script (Snell Roundhand substitute) */
-    .date-script {
-      font-family:'Pinyon Script',cursive;
-      font-size:clamp(1.2rem,5.5vw,1.8rem);
-      color:var(--blue);
-      margin-top:clamp(.2rem,1.5vw,.5rem);
-      animation:up 1s ease .3s both;
-      line-height:1.3;
-      text-shadow: 0 1px 10px rgba(0,0,0,0.9);
-    }
-    .date-script sup {
-      font-size:.55em; vertical-align:super;
-    }
-
-    /* ornate frame — Quran verse */
-    .verse-frame {
-      position:relative;
-      width:88%; max-width:340px;
-      margin-top:clamp(.8rem,3vw,1.4rem);
-      animation:up 1s ease .4s both;
-    }
-    .verse-frame svg.frame-svg {
-      width:100%; display:block;
-    }
-    .verse-text {
-      position:absolute;
-      inset:0; display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      padding:clamp(.8rem,3vw,1.2rem) clamp(1rem,4vw,1.6rem);
-    }
-    .verse-quote {
-      font-family:'Playfair Display',serif;
-      font-style:italic; font-size:clamp(.65rem,2.8vw,.85rem);
-      color:var(--cream); line-height:1.7;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.95), 0 0 20px rgba(0,0,0,0.8);
-    }
-    .verse-ref {
-      font-family:'Playfair Display',serif;
-      font-style:italic; font-size:clamp(.6rem,2.5vw,.75rem);
-      color:var(--cream-dim); margin-top:.4rem;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.95);
-    }
-
-    /* "POINT YOUR CAMERA" instruction below frame */
-    .cam-hint {
-      margin-top:clamp(.6rem,2.5vw,1rem);
-      animation:up 1s ease .5s both;
-    }
-    .cam-hint .dots {
-      display:flex; align-items:center; justify-content:center;
-      gap:.5rem; margin-bottom:.3rem;
-    }
-    .cam-hint .dot {
-      width:6px; height:6px; border-radius:50%;
-      border:1px solid var(--blue-light);
-    }
-    .cam-hint .point-text {
-      font-family:'Jost',sans-serif; font-weight:700;
-      font-size:clamp(.55rem,2.2vw,.7rem);
-      letter-spacing:.35em; color:var(--cream);
-      text-transform:uppercase;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
-    }
-    .cam-hint .tilt-text {
-      font-family:'Jost',sans-serif; font-weight:400;
-      font-size:clamp(.55rem,2.2vw,.7rem);
-      letter-spacing:.25em; color:var(--cream);
-      text-transform:uppercase; margin-top:.15rem;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
-    }
-
-    /* Begin The Journey pill button */
-    #btn {
-      margin-top:clamp(.8rem,3.5vw,1.4rem);
-      display:flex; align-items:center; gap:.8rem;
-      background:transparent;
-      border:2px solid var(--blue);
-      border-radius:999px;
-      color:var(--blue);
-      font-family:'Jost',sans-serif;
-      font-size:clamp(.7rem,3vw,.9rem);
-      font-weight:300; letter-spacing:.12em;
-      padding:.7rem 1.2rem .7rem 2rem;
-      cursor:pointer; transition:all .35s;
-      animation:up 1s ease .6s both;
-      -webkit-tap-highlight-color:transparent;
-    }
-    #btn:active,#btn:hover { background:var(--blue); color:#fff; }
-    .btn-play {
-      width:clamp(28px,7vw,34px); height:clamp(28px,7vw,34px);
-      border-radius:50%; background:var(--blue);
-      display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; transition:background .35s;
-    }
-    #btn:active .btn-play,#btn:hover .btn-play { background:#fff; }
-    .btn-play svg { fill:#fff; width:38%; height:38%; margin-left:8%; }
-    #btn:active .btn-play svg,#btn:hover .btn-play svg { fill:var(--blue); }
-
-    /* ══════════════════════════════
-       AR LAYER — completely transparent
-       shown after landing removed
-    ══════════════════════════════ */
-    #ar-ui {
-      position:fixed; inset:0; z-index:100;
-      display:none; pointer-events:none;
-    }
-    #ar-ui.on { display:block; }
-
-    /* top gradient strip for readability only */
-    .bar {
-      position:absolute; top:0; left:0; right:0;
-      padding:1.4rem 1rem .8rem;
-      background:linear-gradient(to bottom,rgba(0,0,8,.6),transparent);
-      text-align:center; pointer-events:none;
-    }
-    .bar-n {
-      font-family:'Playfair Display',serif; font-size:.95rem;
-      font-style:italic; color:var(--blue-light);
-    }
-    .bar-s {
-      font-size:.56rem; font-weight:300; letter-spacing:.12em;
-      color:var(--cream); opacity:.4; margin-top:.2rem;
-    }
-
-    /* tilt hint — hidden by default, shows after Begin Journey */
-    #hint {
-      position:fixed; bottom:2.2rem; left:50%;
-      transform:translateX(-50%); z-index:200;
-      text-align:center; pointer-events:none;
-      opacity:0; /* hidden by default */
-      transition:opacity .8s;
-    }
-    #hint.visible { opacity:1; }
-    #hint.gone    { opacity:0; }
-    .ha { font-size:1.5rem; color:var(--blue); animation:pulse 1.6s ease infinite; }
-    .ht {
-      font-family:'Playfair Display',serif; font-size:.46rem;
-      letter-spacing:.3em; color:var(--blue-light);
-      text-transform:uppercase; margin-top:.25rem;
-      text-shadow:0 1px 10px #000;
-    }
-
-    /* ══════════════════════════════
-       PANELS — invisible by default
-       gyro positions them, opacity reveals them
-    ══════════════════════════════ */
-    .panel {
-      position:fixed; z-index:300;
-      width:175px;
-      opacity:0;
+    #motion-canvas {
+      position:fixed; inset:0; z-index:5;
+      width:100%; height:100%;
       pointer-events:none;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: transform, opacity;
-      /* prevent GPU layer doubling/glitch */
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      transform: translate3d(0,0,0);
-      -webkit-transform: translate3d(0,0,0);
-    }
-    .panel.on { pointer-events:auto; }
-
-    /* staggered opacity reveal */
-    #pa { top:10%;  left:4%;                      transition-delay: 0s;   }
-    #pr { top:10%;  right:4%;                     transition-delay: 0.4s; }
-    #pv { top:35%;  left:50%; margin-left:-87px;  transition-delay: 0.8s; }
-    #pq { bottom:20%; left:4%;                    transition-delay: 1.2s; }
-    #pc { bottom:20%; right:4%;                   transition-delay: 1.6s; }
-
-    /* panel inner — NO background, pure transparent */
-    .pi {
-      padding:.9rem .8rem;
-      position:relative;
-      border:1px solid rgba(107,127,212,.5);
-      border-top:2px solid var(--blue);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-    /* corner marks */
-    .c { position:absolute; width:9px; height:9px; }
-    .c.tl { top:3px;    left:3px;  border-top:1px solid var(--blue-light); border-left:1px solid var(--blue-light); }
-    .c.tr { top:3px;    right:3px; border-top:1px solid var(--blue-light); border-right:1px solid var(--blue-light); }
-    .c.bl { bottom:3px; left:3px;  border-bottom:1px solid var(--blue-light); border-left:1px solid var(--blue-light); }
-    .c.br { bottom:3px; right:3px; border-bottom:1px solid var(--blue-light); border-right:1px solid var(--blue-light); }
-
-    .ptag {
-      font-family:'Playfair Display',serif; font-size:.38rem;
-      letter-spacing:.45em; color:var(--blue-light);
-      text-transform:uppercase; margin-bottom:.35rem;
-      text-shadow:0 1px 6px #000, 0 0 20px #000;
-    }
-    .ptitle {
-      font-family:'Playfair Display',serif; font-size:.95rem;
-      font-style:italic; color:var(--cream); margin-bottom:.35rem; line-height:1.2;
-      text-shadow:0 1px 8px #000, 0 0 30px #000;
-    }
-    .pbody {
-      font-size:.65rem; font-weight:300; line-height:1.85;
-      color:var(--cream);
-      text-shadow:0 1px 6px #000, 0 0 20px #000;
-    }
-    .pbody strong {
-      color:var(--blue-light); font-weight:400;
-      text-shadow:0 1px 8px #000;
-    }
-
-    /* countdown */
-    .cdg { display:grid; grid-template-columns:repeat(4,1fr); gap:.28rem; margin-top:.4rem; }
-    .cdb {
-      border:1px solid rgba(107,127,212,.4);
-      padding:.4rem .1rem; text-align:center;
-    }
-    .cdn {
-      font-family:'Playfair Display',serif; font-size:1rem;
-      color:var(--blue-light); display:block; line-height:1;
-      text-shadow:0 1px 8px #000;
-    }
-    .cdl {
-      font-size:.38rem; letter-spacing:.15em;
-      color:var(--cream); opacity:.6;
-      text-transform:uppercase; display:block; margin-top:.1rem;
-      text-shadow:0 1px 4px #000;
+      background:transparent;
     }
 
     /* ══════════════════════════════
        PERMISSION SCREEN
-       shown first, before landing
     ══════════════════════════════ */
     #perm-screen {
       position:fixed; inset:0; z-index:1000;
@@ -336,42 +49,34 @@
     }
     #perm-screen.out { opacity:0; pointer-events:none; }
 
-    .perm-icon {
-      font-size:3.5rem; margin-bottom:1.5rem;
-      animation: up 1s ease both;
-    }
+    .perm-icon { font-size:3.5rem; margin-bottom:1.5rem; animation:up 1s ease both; }
     .perm-title {
       font-family:'Playfair Display',serif;
       font-style:italic; font-size:1.4rem;
       color:var(--cream); margin-bottom:.8rem;
-      animation: up 1s ease .1s both;
+      animation:up 1s ease .1s both;
     }
     .perm-sub {
-      font-family:'Jost',sans-serif;
-      font-weight:300; font-size:.78rem;
-      color:var(--cream); opacity:.5;
-      line-height:1.9; max-width:260px;
-      margin-bottom:2rem;
-      animation: up 1s ease .2s both;
+      font-family:'Jost',sans-serif; font-weight:300;
+      font-size:.78rem; color:var(--cream); opacity:.5;
+      line-height:1.9; max-width:260px; margin-bottom:2rem;
+      animation:up 1s ease .2s both;
     }
     #perm-btn {
       display:flex; align-items:center; gap:.8rem;
       background:var(--blue); border:none;
       border-radius:999px; color:#fff;
-      font-family:'Jost',sans-serif;
-      font-size:.75rem; font-weight:300;
-      letter-spacing:.18em; text-transform:uppercase;
-      padding:.85rem 2.2rem;
-      cursor:pointer; transition:all .3s;
-      animation: up 1s ease .3s both;
+      font-family:'Jost',sans-serif; font-size:.75rem;
+      font-weight:300; letter-spacing:.18em; text-transform:uppercase;
+      padding:.85rem 2.2rem; cursor:pointer; transition:all .3s;
+      animation:up 1s ease .3s both;
       -webkit-tap-highlight-color:transparent;
     }
     #perm-btn:active { opacity:.8; transform:scale(.97); }
     .perm-note {
-      font-family:'Jost',sans-serif;
-      font-size:.6rem; color:var(--cream);
-      opacity:.3; margin-top:1.2rem;
-      animation: up 1s ease .4s both;
+      font-family:'Jost',sans-serif; font-size:.6rem;
+      color:var(--cream); opacity:.3; margin-top:1.2rem;
+      animation:up 1s ease .4s both;
     }
 
     /* ══════════════════════════════
@@ -379,72 +84,210 @@
     ══════════════════════════════ */
     #landing {
       position:fixed; inset:0; z-index:900;
-      display:none;
-      align-items:center; justify-content:center;
-      background: transparent;
-      overflow:hidden;
-      opacity:0;
-      transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+      display:none; align-items:center; justify-content:center;
+      background:transparent; overflow:hidden;
+      opacity:0; transition:opacity 1.8s cubic-bezier(0.4,0,0.2,1);
     }
     #landing.show { display:flex; opacity:1; }
     #landing.out  { opacity:0; pointer-events:none; }
 
-    /* Begin The Journey pill button — matches designer's style */
+    /* Edge vignette — keeps text readable over any camera scene */
+    #landing-vignette {
+      position:absolute; inset:0; pointer-events:none; z-index:1;
+      background:radial-gradient(ellipse 88% 88% at 50% 50%,
+        transparent 30%, rgba(0,0,0,.6) 100%);
+    }
+
+    /* Motion graphic text stack */
+    .motion-text {
+      position:absolute; inset:0; z-index:10;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      pointer-events:none;
+    }
+    .m-lbl {
+      font-family:'Jost',sans-serif; font-weight:200;
+      font-size:clamp(.55rem,2.5vw,.72rem); letter-spacing:.55em;
+      color:var(--blue-light); text-transform:uppercase;
+      opacity:0; animation:fadeUp 1.2s ease .3s forwards;
+      text-shadow:0 1px 14px rgba(0,0,0,.98);
+    }
+    .m-names {
+      font-family:'Great Vibes',cursive;
+      font-size:clamp(3.2rem,18vw,6rem);
+      color:var(--cream); line-height:1.05;
+      opacity:0; animation:fadeUp 1.4s ease .6s forwards;
+      text-shadow:0 0 35px rgba(107,127,212,.55), 0 2px 14px rgba(0,0,0,.99);
+    }
+    .m-divider {
+      display:flex; align-items:center; gap:10px; margin:6px 0;
+      opacity:0; animation:fadeUp 1s ease 1s forwards;
+    }
+    .m-div-line { width:48px; height:.5px; background:rgba(107,127,212,.6); }
+    .m-div-dia  { width:5px; height:5px; background:var(--blue); transform:rotate(45deg); }
+    .m-date {
+      font-family:'Jost',sans-serif; font-weight:200;
+      font-size:clamp(.55rem,2.2vw,.7rem); letter-spacing:.35em;
+      color:var(--cream-dim); text-transform:uppercase;
+      opacity:0; animation:fadeUp 1s ease 1.2s forwards;
+      text-shadow:0 1px 12px rgba(0,0,0,.99);
+    }
+    .m-verse {
+      font-family:'Playfair Display',serif; font-style:italic;
+      font-size:clamp(.55rem,2.2vw,.7rem); color:rgba(200,184,154,.7);
+      letter-spacing:.06em; margin-top:14px;
+      max-width:200px; text-align:center; line-height:1.9;
+      opacity:0; animation:fadeUp 1s ease 1.6s forwards;
+      text-shadow:0 1px 10px rgba(0,0,0,.99);
+    }
+
+    /* Corner ornaments */
+    .orn { position:absolute; z-index:11; opacity:0; animation:fadeIn .8s ease 2s forwards; }
+    .orn-tl { top:16px; left:16px; }
+    .orn-tr { top:16px; right:16px; transform:scaleX(-1); }
+    .orn-bl { bottom:80px; left:16px; transform:scaleY(-1); }
+    .orn-br { bottom:80px; right:16px; transform:scale(-1,-1); }
+
+    /* Pulsing rings */
+    .m-ring {
+      position:absolute; border-radius:50%;
+      border:1px solid rgba(107,127,212,.15);
+      z-index:3; pointer-events:none;
+      left:50%; top:46%; transform:translate(-50%,-50%);
+    }
+
+    /* Begin The Journey button */
     #btn {
+      position:absolute; bottom:7%; left:50%; transform:translateX(-50%);
+      z-index:12;
       display:flex; align-items:center; gap:.8rem;
-      background:transparent;
-      border:2px solid var(--blue);
-      border-radius:999px;
-      color:var(--blue);
+      background:transparent; border:2px solid var(--blue);
+      border-radius:999px; color:var(--blue);
       font-family:'Jost',sans-serif;
-      font-size:clamp(.75rem,3vw,.95rem);
+      font-size:clamp(.7rem,3vw,.9rem);
       font-weight:300; letter-spacing:.12em;
       padding:.75rem 1.5rem .75rem 2rem;
       cursor:pointer; transition:all .35s;
-      -webkit-tap-highlight-color:transparent;
       white-space:nowrap;
+      opacity:0; animation:fadeUp 1s ease 2.2s forwards;
+      -webkit-tap-highlight-color:transparent;
     }
-    #btn:active,#btn:hover { background:var(--blue); color:#fff; }
+    #btn:active, #btn:hover { background:var(--blue); color:#fff; }
     .btn-play {
-      width:32px; height:32px;
-      border-radius:50%; background:var(--blue);
-      display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; transition:background .35s;
+      width:32px; height:32px; border-radius:50%;
+      background:var(--blue); display:flex; align-items:center;
+      justify-content:center; flex-shrink:0; transition:background .35s;
     }
-    #btn:active .btn-play,#btn:hover .btn-play { background:#fff; }
+    #btn:active .btn-play, #btn:hover .btn-play { background:#fff; }
     .btn-play svg { fill:#fff; width:38%; height:38%; margin-left:8%; }
-    #btn:active .btn-play svg,#btn:hover .btn-play svg { fill:var(--blue); }
+    #btn:active .btn-play svg, #btn:hover .btn-play svg { fill:var(--blue); }
 
-    /* float animations — gentle, slow */
+    /* ══════════════════════════════
+       AR UI
+    ══════════════════════════════ */
+    #ar-ui { position:fixed; inset:0; z-index:100; display:none; pointer-events:none; }
+    #ar-ui.on { display:block; }
+
+    .bar {
+      position:absolute; top:0; left:0; right:0;
+      padding:1.4rem 1rem .8rem;
+      background:linear-gradient(to bottom,rgba(0,0,8,.6),transparent);
+      text-align:center; pointer-events:none;
+    }
+    .bar-n { font-family:'Playfair Display',serif; font-size:.95rem; font-style:italic; color:var(--blue-light); }
+    .bar-s { font-size:.56rem; font-weight:300; letter-spacing:.12em; color:var(--cream); opacity:.4; margin-top:.2rem; }
+
+    /* Tilt hint */
+    #hint {
+      position:fixed; bottom:2.2rem; left:50%; transform:translateX(-50%);
+      z-index:200; text-align:center; pointer-events:none;
+      opacity:0; transition:opacity .8s;
+    }
+    #hint.visible { opacity:1; }
+    #hint.gone    { opacity:0; }
+    .ha { font-size:1.5rem; color:var(--blue); animation:pulse 1.6s ease infinite; }
+    .ht { font-family:'Playfair Display',serif; font-size:.46rem; letter-spacing:.3em; color:var(--blue-light); text-transform:uppercase; margin-top:.25rem; text-shadow:0 1px 10px #000; }
+
+    /* ══════════════════════════════
+       PANELS
+    ══════════════════════════════ */
+    .panel {
+      position:fixed; z-index:300; width:175px;
+      opacity:0; pointer-events:none;
+      transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1);
+      will-change:transform,opacity;
+      backface-visibility:hidden; -webkit-backface-visibility:hidden;
+      transform:translate3d(0,0,0); -webkit-transform:translate3d(0,0,0);
+    }
+    .panel.on { pointer-events:auto; }
+
+    #pa { top:10%; left:4%;                     transition-delay:0s;   }
+    #pr { top:10%; right:4%;                    transition-delay:.4s;  }
+    #pv { top:35%; left:50%; margin-left:-87px; transition-delay:.8s;  }
+    #pq { bottom:20%; left:4%;                  transition-delay:1.2s; }
+    #pc { bottom:20%; right:4%;                 transition-delay:1.6s; }
+
+    .pi {
+      padding:.9rem .8rem; position:relative;
+      border:1px solid rgba(107,127,212,.5);
+      border-top:2px solid var(--blue);
+      backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    }
+    .c { position:absolute; width:9px; height:9px; }
+    .c.tl { top:3px;    left:3px;  border-top:1px solid var(--blue-light); border-left:1px solid var(--blue-light); }
+    .c.tr { top:3px;    right:3px; border-top:1px solid var(--blue-light); border-right:1px solid var(--blue-light); }
+    .c.bl { bottom:3px; left:3px;  border-bottom:1px solid var(--blue-light); border-left:1px solid var(--blue-light); }
+    .c.br { bottom:3px; right:3px; border-bottom:1px solid var(--blue-light); border-right:1px solid var(--blue-light); }
+
+    .ptag   { font-family:'Playfair Display',serif; font-size:.38rem; letter-spacing:.45em; color:var(--blue-light); text-transform:uppercase; margin-bottom:.35rem; text-shadow:0 1px 6px #000,0 0 20px #000; }
+    .ptitle { font-family:'Playfair Display',serif; font-size:.95rem; font-style:italic; color:var(--cream); margin-bottom:.35rem; line-height:1.2; text-shadow:0 1px 8px #000,0 0 30px #000; }
+    .pbody  { font-size:.65rem; font-weight:300; line-height:1.85; color:var(--cream); text-shadow:0 1px 6px #000,0 0 20px #000; }
+    .pbody strong { color:var(--blue-light); font-weight:400; text-shadow:0 1px 8px #000; }
+
+    .cdg { display:grid; grid-template-columns:repeat(4,1fr); gap:.28rem; margin-top:.4rem; }
+    .cdb { border:1px solid rgba(107,127,212,.4); padding:.4rem .1rem; text-align:center; }
+    .cdn { font-family:'Playfair Display',serif; font-size:1rem; color:var(--blue-light); display:block; line-height:1; text-shadow:0 1px 8px #000; }
+    .cdl { font-size:.38rem; letter-spacing:.15em; color:var(--cream); opacity:.6; text-transform:uppercase; display:block; margin-top:.1rem; text-shadow:0 1px 4px #000; }
+
+    /* Float animations */
     @keyframes fl1{0%,100%{transform:translateY(0px)}   50%{transform:translateY(-8px)}}
     @keyframes fl2{0%,100%{transform:translateY(-5px)}  50%{transform:translateY(4px)}}
     @keyframes fl3{0%,100%{transform:translateY(0px)}   50%{transform:translateY(7px)}}
     @keyframes fl4{0%,100%{transform:translateY(-4px)}  50%{transform:translateY(5px)}}
     @keyframes fl5{0%,100%{transform:translateY(3px)}   50%{transform:translateY(-6px)}}
 
-    /* apply float AFTER panel is fully visible */
-    #pa.on .pi { animation: fl1 6s ease-in-out 1.2s infinite; }
-    #pr.on .pi { animation: fl2 7s ease-in-out 1.5s infinite; }
-    #pv.on .pi { animation: fl3 6.5s ease-in-out 1.8s infinite; }
-    #pq.on .pi { animation: fl4 8s ease-in-out 2.1s infinite; }
-    #pc.on .pi { animation: fl5 5.5s ease-in-out 2.4s infinite; }
+    #pa.on .pi { animation:fl1 6s ease-in-out 1.2s infinite; }
+    #pr.on .pi { animation:fl2 7s ease-in-out 1.5s infinite; }
+    #pv.on .pi { animation:fl3 6.5s ease-in-out 1.8s infinite; }
+    #pq.on .pi { animation:fl4 8s ease-in-out 2.1s infinite; }
+    #pc.on .pi { animation:fl5 5.5s ease-in-out 2.4s infinite; }
 
-    @keyframes up     { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    @keyframes shimmer{ 0%{background-position:-200% center} 100%{background-position:200% center} }
-    @keyframes pulse  { 0%,100%{opacity:.4} 50%{opacity:1} }
+    /* Pulse rings animation */
+    @keyframes pulse-ring {
+      0%   { transform:translate(-50%,-50%) scale(.92); opacity:.2; }
+      50%  { transform:translate(-50%,-50%) scale(1.05); opacity:.08; }
+      100% { transform:translate(-50%,-50%) scale(.92); opacity:.2; }
+    }
+
+    @keyframes up      { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+    @keyframes pulse   { 0%,100%{opacity:.4} 50%{opacity:1} }
   </style>
 </head>
 <body>
 
-<!-- CAMERA — always behind everything -->
+<!-- CAMERA -->
 <video id="cam" autoplay playsinline muted></video>
 
-<!-- MUSIC (background only, no visible button) -->
+<!-- MOTION GRAPHIC CANVAS — always on top of camera, transparent -->
+<canvas id="motion-canvas"></canvas>
+
+<!-- MUSIC -->
 <audio id="bgm" src="nocturne.mp3" loop preload="auto"></audio>
 
 <!-- ══════════════════════════════
-     PERMISSION SCREEN (shown first)
+     PERMISSION SCREEN
 ══════════════════════════════ -->
 <div id="perm-screen">
   <div class="perm-icon">📷</div>
@@ -462,42 +305,80 @@
 ══════════════════ -->
 <div id="landing">
 
-  <!-- Designer's PNG — transparent bg, floats over camera -->
-  <img id="landing-img" src="landing-design.png"
-    style="
-      position:absolute;
-      top:0; left:50%;
-      transform:translateX(-50%);
-      width:auto; height:100%;
-      max-width:100%;
-      pointer-events:none;
-      image-rendering:-webkit-optimize-contrast;
-      image-rendering:crisp-edges;
-      image-rendering:high-quality;
-    "
-  />
+  <!-- Edge vignette -->
+  <div id="landing-vignette"></div>
 
-  <!-- Begin The Journey button — sits at very bottom matching "move to explore" position -->
-  <div style="
-    position:absolute;
-    bottom:7%;
-    left:50%; transform:translateX(-50%);
-    width:100%;
-    display:flex; justify-content:center;
-    z-index:10;
-  ">
-    <button id="btn">
-      Begin The Journey
-      <span class="btn-play">
-        <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
-      </span>
-    </button>
+  <!-- Pulsing rings -->
+  <div class="m-ring" style="width:min(380px,90vw);height:min(380px,90vw);animation:pulse-ring 6s ease-in-out infinite;"></div>
+  <div class="m-ring" style="width:min(270px,65vw);height:min(270px,65vw);animation:pulse-ring 6s ease-in-out 1.2s infinite;"></div>
+  <div class="m-ring" style="width:min(165px,40vw);height:min(165px,40vw);animation:pulse-ring 6s ease-in-out 2.4s infinite;"></div>
+
+  <!-- Corner ornaments -->
+  <div class="orn orn-tl">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <circle cx="0" cy="0" r="2.5" fill="#6b7fd4" opacity=".9"/>
+      <line x1="8" y1="8" x2="18" y2="8" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+      <line x1="8" y1="8" x2="8" y2="18" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+    </svg>
   </div>
+  <div class="orn orn-tr">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <circle cx="0" cy="0" r="2.5" fill="#6b7fd4" opacity=".9"/>
+      <line x1="8" y1="8" x2="18" y2="8" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+      <line x1="8" y1="8" x2="8" y2="18" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+    </svg>
+  </div>
+  <div class="orn orn-bl">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <circle cx="0" cy="0" r="2.5" fill="#6b7fd4" opacity=".9"/>
+      <line x1="8" y1="8" x2="18" y2="8" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+      <line x1="8" y1="8" x2="8" y2="18" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+    </svg>
+  </div>
+  <div class="orn orn-br">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#6b7fd4" stroke-width=".8" opacity=".8"/>
+      <circle cx="0" cy="0" r="2.5" fill="#6b7fd4" opacity=".9"/>
+      <line x1="8" y1="8" x2="18" y2="8" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+      <line x1="8" y1="8" x2="8" y2="18" stroke="#6b7fd4" stroke-width=".5" opacity=".4"/>
+    </svg>
+  </div>
+
+  <!-- Text -->
+  <div class="motion-text">
+    <div class="m-lbl">The Wedding Of</div>
+    <div class="m-names">Abbyan &amp; Nabila</div>
+    <div class="m-divider">
+      <div class="m-div-line"></div>
+      <div class="m-div-dia"></div>
+      <div class="m-div-line"></div>
+    </div>
+    <div class="m-date">14 · June · 2026 · Bandung</div>
+    <div class="m-verse">
+      "And He placed between you<br>affection and mercy."<br>
+      <span style="font-style:normal;font-size:.55em;letter-spacing:.2em;color:rgba(200,184,154,.45);">— QS. AR-RUM : 21</span>
+    </div>
+  </div>
+
+  <!-- Begin The Journey button -->
+  <button id="btn">
+    Begin The Journey
+    <span class="btn-play">
+      <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
+    </span>
+  </button>
 
 </div>
 
 <!-- ══════════════════
-     AR UI (transparent)
+     AR UI
 ══════════════════ -->
 <div id="ar-ui">
   <div class="bar">
@@ -506,26 +387,21 @@
   </div>
 </div>
 
-<!-- tilt hint — only shown after Begin Journey -->
 <div id="hint">
   <div class="ha">↕ ↔</div>
   <div class="ht">Move to explore</div>
 </div>
 
 <!-- ══════════════════
-     PANELS — transparent, off-screen
-     gyro JS moves them into view
+     PANELS
 ══════════════════ -->
-
-<!-- AKAD — lives to the LEFT -->
 <div class="panel" id="pa">
   <div class="pi">
-    <div class="c tl"></div><div class="c tr"></div>
-    <div class="c bl"></div><div class="c br"></div>
+    <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
     <div class="ptag">✦ Akad Nikah</div>
     <div class="ptitle">Sacred Vows</div>
     <div class="pbody">
-      <strong>Saturday, 14 June 2025</strong><br/>
+      <strong>Saturday, 14 June 2026</strong><br/>
       08.00 – 10.00 WIB<br/><br/>
       Masjid Al-Irsyad<br/>
       Kota Baru Parahyangan<br/>
@@ -534,15 +410,13 @@
   </div>
 </div>
 
-<!-- RESEPSI — lives to the RIGHT -->
 <div class="panel" id="pr">
   <div class="pi">
-    <div class="c tl"></div><div class="c tr"></div>
-    <div class="c bl"></div><div class="c br"></div>
+    <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
     <div class="ptag">✦ Resepsi</div>
     <div class="ptitle">Celebration</div>
     <div class="pbody">
-      <strong>Saturday, 14 June 2025</strong><br/>
+      <strong>Saturday, 14 June 2026</strong><br/>
       11.00 – 15.00 WIB<br/><br/>
       Grand Ballroom<br/>
       The Papandayan Hotel<br/>
@@ -551,29 +425,25 @@
   </div>
 </div>
 
-<!-- VENUE — lives UP (tilt phone up to see) -->
 <div class="panel" id="pv">
   <div class="pi">
-    <div class="c tl"></div><div class="c tr"></div>
-    <div class="c bl"></div><div class="c br"></div>
+    <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
     <div class="ptag">✦ Details</div>
     <div class="ptitle">Dress &amp; RSVP</div>
     <div class="pbody">
       <strong>Dress Code</strong><br/>
       Sage Green &amp; Dusty Gold<br/><br/>
       <strong>RSVP by</strong><br/>
-      1 June 2025<br/><br/>
+      1 June 2026<br/><br/>
       <strong>Contact</strong><br/>
       +62 812-3456-7890
     </div>
   </div>
 </div>
 
-<!-- QURAN — lives DOWN-LEFT -->
 <div class="panel" id="pq">
   <div class="pi">
-    <div class="c tl"></div><div class="c tr"></div>
-    <div class="c bl"></div><div class="c br"></div>
+    <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
     <div class="ptag">✦ A Blessing</div>
     <div class="ptitle">Our Prayer</div>
     <div class="pbody" style="font-style:italic;font-size:.63rem;line-height:2;">
@@ -584,11 +454,9 @@
   </div>
 </div>
 
-<!-- COUNTDOWN — lives DOWN-RIGHT -->
 <div class="panel" id="pc">
   <div class="pi">
-    <div class="c tl"></div><div class="c tr"></div>
-    <div class="c bl"></div><div class="c br"></div>
+    <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
     <div class="ptag">✦ Counting Down</div>
     <div class="ptitle">The Big Day</div>
     <div class="cdg">
@@ -603,36 +471,156 @@
 <script>
 'use strict';
 
+/* ══════════════════════════════
+   MOTION GRAPHIC PARTICLE SYSTEM
+   Transparent canvas — floats over camera
+══════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('motion-canvas');
+  let W, H;
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = W;
+    canvas.height = H;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+
+  const COLS = [
+    'rgba(107,127,212,',
+    'rgba(200,184,154,',
+    'rgba(232,220,200,',
+    'rgba(143,158,224,'
+  ];
+
+  function rand(a,b){ return a + (b-a)*Math.random(); }
+
+  /* Stars */
+  const stars = Array.from({length:85}, ()=>({
+    x:rand(0,1), y:rand(0,1),
+    r:rand(.4,1.3),
+    col:COLS[Math.floor(Math.random()*COLS.length)],
+    a:rand(.2,.75), phase:rand(0,Math.PI*2), speed:rand(.4,1.2)
+  }));
+
+  /* Floating dust */
+  const dust = Array.from({length:26}, ()=>({
+    x:rand(0,1), y:rand(-.1,1.1),
+    vx:rand(-.0003,.0003), vy:rand(.0005,.0013),
+    r:rand(1.2,3.4),
+    col:COLS[Math.floor(Math.random()*COLS.length)],
+    a:rand(.25,.65), phase:rand(0,Math.PI*2)
+  }));
+
+  /* Shooting streaks */
+  const streaks = Array.from({length:4}, ()=>makeStreak());
+
+  function makeStreak(){
+    return {
+      x:rand(.05,.9), y:rand(.05,.45),
+      len:rand(.06,.13), angle:rand(.18,.3),
+      speed:rand(.003,.006),
+      a:0, life:0, maxLife:rand(55,110),
+      col:COLS[Math.floor(Math.random()*2)]
+    };
+  }
+
+  let t = 0;
+  let motionActive = true;
+
+  function drawMotion(){
+    if(!motionActive){ requestAnimationFrame(drawMotion); return; }
+
+    /* transparent clear — camera shows through */
+    ctx.clearRect(0,0,W,H);
+    t += .016;
+
+    /* Stars twinkle */
+    stars.forEach(s=>{
+      const f = s.a * (.55 + .45*Math.sin(t*s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+      ctx.fillStyle = s.col + f + ')';
+      ctx.fill();
+    });
+
+    /* Dust drift */
+    dust.forEach(d=>{
+      d.x += d.vx + Math.sin(t*.3 + d.phase)*.00018;
+      d.y += d.vy;
+      if(d.y > 1.12){ d.y = -.05; d.x = rand(0,1); }
+      const p = d.a * (.65 + .35*Math.sin(t + d.phase));
+      ctx.beginPath();
+      ctx.arc(d.x*W, d.y*H, d.r, 0, Math.PI*2);
+      ctx.fillStyle = d.col + p + ')';
+      ctx.fill();
+    });
+
+    /* Shooting streaks */
+    streaks.forEach((s,i)=>{
+      s.life++;
+      if(s.life > s.maxLife){ streaks[i] = makeStreak(); return; }
+      const prog = s.life / s.maxLife;
+      s.a = prog < .15 ? prog/.15 : prog > .7 ? (1-prog)/.3 : 1;
+      s.x += s.speed * Math.cos(s.angle);
+      s.y += s.speed * Math.sin(s.angle) * .35;
+      const x1=s.x*W, y1=s.y*H;
+      const x0=x1 - s.len*W*Math.cos(s.angle);
+      const y0=y1 - s.len*W*Math.sin(s.angle)*.35;
+      const g = ctx.createLinearGradient(x0,y0,x1,y1);
+      g.addColorStop(0, s.col+'0)');
+      g.addColorStop(1, s.col+(s.a*.75)+')');
+      ctx.beginPath();
+      ctx.moveTo(x0,y0); ctx.lineTo(x1,y1);
+      ctx.strokeStyle = g; ctx.lineWidth = 1.1; ctx.stroke();
+    });
+
+    /* Subtle centre glow */
+    const gx = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.32);
+    gx.addColorStop(0,'rgba(107,127,212,.04)');
+    gx.addColorStop(1,'rgba(107,127,212,0)');
+    ctx.fillStyle = gx;
+    ctx.fillRect(0,0,W,H);
+
+    requestAnimationFrame(drawMotion);
+  }
+
+  drawMotion();
+
+  /* Expose control so AR phase can tone it down if needed */
+  window._motionCtrl = { pause(){ motionActive=false; }, resume(){ motionActive=true; } };
+})();
+
 /* ── COUNTDOWN ── */
 const WED = new Date('2026-06-14T08:00:00+07:00');
 function tick(){
   const d = WED - Date.now();
-  if(d <= 0){ ['d','h','m','s'].forEach(k => document.getElementById('cd-'+k).textContent='00'); return; }
+  if(d <= 0){ ['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent='00'); return; }
   const pad = n => String(n).padStart(2,'0');
   document.getElementById('cd-d').textContent = pad(Math.floor(d/864e5));
   document.getElementById('cd-h').textContent = pad(Math.floor(d%864e5/36e5));
   document.getElementById('cd-m').textContent = pad(Math.floor(d%36e5/6e4));
   document.getElementById('cd-s').textContent = pad(Math.floor(d%6e4/1e3));
 }
-setInterval(tick, 1000); tick();
+setInterval(tick,1000); tick();
 
 /* ── MUSIC ── */
 const bgm = document.getElementById('bgm');
-
 function startMusic(){
-  bgm.volume = 0;
-  bgm.currentTime = 0;
+  bgm.volume = 0; bgm.currentTime = 0;
   const p = bgm.play();
   if(p !== undefined){
     p.then(()=>{
-      /* fade volume up */
       let v = 0;
       const iv = setInterval(()=>{
-        v = Math.min(v + 0.02, 0.5);
-        bgm.volume = v;
-        if(v >= 0.5) clearInterval(iv);
+        v = Math.min(v+.02,.5); bgm.volume = v;
+        if(v >= .5) clearInterval(iv);
       }, 100);
-    }).catch(e => console.warn('audio:', e));
+    }).catch(e=>console.warn('audio:',e));
   }
 }
 
@@ -644,70 +632,60 @@ async function startCam(){
     });
     const vid = document.getElementById('cam');
     vid.srcObject = stream;
-    await new Promise(resolve =>{
+    await new Promise(resolve=>{
       vid.oncanplay = ()=>{ vid.play(); resolve(); };
       setTimeout(resolve, 1500);
     });
-  }catch(e){ console.warn('cam:', e); }
+  }catch(e){ console.warn('cam:',e); }
 }
 
 /* ── GYRO ── */
 const ANCHORS = {
-  pa:{ ax:-0.7, ay: 0   },
-  pr:{ ax: 0.7, ay: 0   },
-  pv:{ ax: 0,   ay:-0.7 },
-  pq:{ ax:-0.6, ay: 0.7 },
-  pc:{ ax: 0.6, ay: 0.7 },
+  pa:{ ax:-0.7, ay:0    },
+  pr:{ ax:0.7,  ay:0    },
+  pv:{ ax:0,    ay:-0.7 },
+  pq:{ ax:-0.6, ay:0.7  },
+  pc:{ ax:0.6,  ay:0.7  },
 };
 let sG=0, sB=90;
 
-function applyGyro(g, b){
+function applyGyro(g,b){
   const W=window.innerWidth, H=window.innerHeight;
   const gF=Math.max(-1,Math.min(1,g/30));
   const bF=Math.max(-1,Math.min(1,(b-90)/30));
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el) return;
-    const tx = (ax+gF*0.7)*W*0.5;
-    const ty = (ay+bF*0.7)*H*0.5;
-    /* translate3d forces GPU compositing — prevents glitch/doubling */
-    el.style.transform = `translate3d(${tx}px,${ty}px,0)`;
+    const tx=(ax+gF*.7)*W*.5;
+    const ty=(ay+bF*.7)*H*.5;
+    el.style.transform=`translate3d(${tx}px,${ty}px,0)`;
   });
 }
 
 function initGyro(){
   const W=window.innerWidth, H=window.innerHeight;
-
-  /* pre-position all panels off-screen instantly (no transition) */
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el) return;
-    el.style.transition = 'none';
-    el.style.transform = `translate3d(${ax*W*0.5}px,${ay*H*0.5}px,0)`;
+    el.style.transition='none';
+    el.style.transform=`translate3d(${ax*W*.5}px,${ay*H*.5}px,0)`;
   });
-
-  /* re-enable transition after a frame so subsequent moves are smooth */
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
       Object.keys(ANCHORS).forEach(id=>{
         const el=document.getElementById(id);
-        if(el) el.style.transition = 'opacity 1.2s ease';
-        /* note: transform transition intentionally removed —
-           gyro updates every frame so transition on transform causes lag */
+        if(el) el.style.transition='opacity 1.2s ease';
       });
     });
   });
-
   let hasGyro=false;
-  window.addEventListener('deviceorientation', e=>{
+  window.addEventListener('deviceorientation',e=>{
     if(e.gamma===null && e.beta===null) return;
     hasGyro=true;
-    sG += (e.gamma-sG)*0.12;
-    sB += (e.beta-sB)*0.12;
-    applyGyro(sG, sB);
+    sG += (e.gamma-sG)*.12;
+    sB += (e.beta-sB)*.12;
+    applyGyro(sG,sB);
   });
-
-  /* fallback: no gyro detected → centre all panels */
   setTimeout(()=>{
     if(!hasGyro){
       Object.keys(ANCHORS).forEach(id=>{
@@ -715,81 +693,57 @@ function initGyro(){
         if(el) el.style.transform='translate3d(0,0,0)';
       });
     }
-  }, 2500);
+  },2500);
 }
 
 /* ══════════════════════════════
-   STEP 1 — Permission screen
+   STEP 1 — Permission
 ══════════════════════════════ */
 document.getElementById('perm-btn').addEventListener('click', async function(){
-
-  /* iOS gyro permission — must be synchronous on gesture */
-  if(typeof DeviceOrientationEvent !== 'undefined' &&
-     typeof DeviceOrientationEvent.requestPermission === 'function'){
+  if(typeof DeviceOrientationEvent!=='undefined' &&
+     typeof DeviceOrientationEvent.requestPermission==='function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
-
-  /* Start camera */
   await startCam();
-
-  /* Fade out permission screen */
-  const perm = document.getElementById('perm-screen');
+  const perm=document.getElementById('perm-screen');
   perm.classList.add('out');
-  setTimeout(()=>{ perm.style.display='none'; }, 700);
-
-  /* Show landing (camera already live behind) */
-  setTimeout(()=>{
-    document.getElementById('landing').classList.add('show');
-  }, 350);
+  setTimeout(()=>{ perm.style.display='none'; },700);
+  setTimeout(()=>{ document.getElementById('landing').classList.add('show'); },350);
 });
 
 /* ══════════════════════════════
    STEP 2 — Begin Journey
 ══════════════════════════════ */
 document.getElementById('btn').addEventListener('click', function(){
-
-  /* START MUSIC — synchronous first line */
   startMusic();
-
-  /* Fade out landing slowly */
-  const land = document.getElementById('landing');
+  const land=document.getElementById('landing');
   land.classList.add('out');
 
-  /* Wait for landing to fully fade THEN reveal everything */
   setTimeout(()=>{
-    land.style.display = 'none';
-
-    /* Show AR layer */
+    land.style.display='none';
     document.getElementById('ar-ui').classList.add('on');
-
-    /* Init gyro FIRST — pre-positions panels off-screen via transform */
     initGyro();
 
-    /* Small delay then reveal panels one by one via JS stagger */
     setTimeout(()=>{
-      const panels = ['pa','pr','pv','pq','pc'];
-      panels.forEach((id, i) => {
+      const panels=['pa','pr','pv','pq','pc'];
+      panels.forEach((id,i)=>{
         setTimeout(()=>{
-          const el = document.getElementById(id);
-          if(el){
-            el.classList.add('on');
-            el.style.opacity = '1';
-          }
-        }, i * 400);
+          const el=document.getElementById(id);
+          if(el){ el.classList.add('on'); el.style.opacity='1'; }
+        }, i*400);
       });
-    }, 300);
+    },300);
 
-    /* Show tilt hint after all panels are visible, then fade out after 5s */
     setTimeout(()=>{
-      const hint = document.getElementById('hint');
+      const hint=document.getElementById('hint');
       hint.classList.add('visible');
       setTimeout(()=>{
         hint.classList.remove('visible');
         hint.classList.add('gone');
-      }, 5000);
-    }, 2500);
+      },5000);
+    },2500);
 
-  }, 1800);
+  },1800);
 });
 </script>
 </body>
