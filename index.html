@@ -223,20 +223,6 @@
       color:var(--cream); opacity:.4; margin-top:.2rem;
     }
 
-    /* music btn */
-    #mus {
-      position:fixed; top:1rem; right:1rem; z-index:999;
-      width:40px; height:40px; border-radius:50%;
-      background:rgba(0,0,10,.55); border:1px solid rgba(107,127,212,.4);
-      color:var(--blue-light); font-size:1.1rem;
-      display:none; align-items:center; justify-content:center;
-      cursor:pointer; backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      -webkit-tap-highlight-color:transparent; transition:all .3s;
-    }
-    #mus.on  { display:flex; }
-    #mus.off { opacity:.35; }
-
     /* tilt hint */
     #hint {
       position:fixed; bottom:2.2rem; left:50%;
@@ -410,9 +396,8 @@
 <!-- CAMERA — always behind everything -->
 <video id="cam" autoplay playsinline muted></video>
 
-<!-- MUSIC -->
+<!-- MUSIC (background only, no visible button) -->
 <audio id="bgm" src="nocturne.mp3" loop preload="auto"></audio>
-<button id="mus" aria-label="music">♪</button>
 
 <!-- ══════════════════════════════
      PERMISSION SCREEN (shown first)
@@ -651,35 +636,17 @@ setInterval(tick,1000); tick();
 
 /* ── MUSIC ── */
 const bgm = document.getElementById('bgm');
-const musBtn = document.getElementById('mus');
-bgm.volume = 50;
-let audioUnlocked = false;
-
-/* Unlock audio context on first user gesture (iOS requirement) */
-function unlockAudio(){
-  if(audioUnlocked) return;
-  bgm.play().then(()=>{
-    bgm.pause();
-    bgm.currentTime = 0;
-    audioUnlocked = true;
-  }).catch(()=>{});
-}
+bgm.volume = 0;
 
 function fadeMusic(){
-  bgm.volume = 50;
-  bgm.play().catch(()=>{});
+  /* volume fade in */
   let v = 0;
   const iv = setInterval(()=>{
-    v = Math.min(v + 0.02, 0.5);
+    v = Math.min(v + 0.015, 0.5);
     bgm.volume = v;
     if(v >= 0.5) clearInterval(iv);
-  }, 80);
+  }, 100);
 }
-
-musBtn.addEventListener('click', ()=>{
-  if(bgm.paused){ bgm.play(); musBtn.textContent='♪'; musBtn.classList.remove('off'); }
-  else { bgm.pause(); musBtn.textContent='♩'; musBtn.classList.add('off'); }
-});
 
 /* ── CAMERA ── */
 async function startCam(){
@@ -756,16 +723,16 @@ function initGyro(){
 /* ── STEP 1: Permission button ── */
 document.getElementById('perm-btn').addEventListener('click', async()=>{
 
-  /* Unlock audio immediately on first user gesture — iOS requirement */
-  unlockAudio();
+  /* Play + immediately pause to unlock audio context on iOS — must be first synchronous action */
+  bgm.play().then(()=>{ bgm.pause(); bgm.currentTime = 0; }).catch(()=>{});
 
-  /* iOS 13+ requires explicit DeviceOrientation permission on user gesture */
-  if(typeof DeviceOrientationEvent!=='undefined'&&
+  /* iOS DeviceOrientation permission */
+  if(typeof DeviceOrientationEvent!=='undefined' &&
      typeof DeviceOrientationEvent.requestPermission==='function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
 
-  /* Start camera — this triggers the browser permission dialog */
+  /* Start camera */
   await startCam();
 
   /* Fade out permission screen */
@@ -773,7 +740,7 @@ document.getElementById('perm-btn').addEventListener('click', async()=>{
   perm.classList.add('out');
   setTimeout(()=>{ perm.style.display='none'; }, 700);
 
-  /* Show landing — camera is already live behind it */
+  /* Show landing over live camera */
   setTimeout(()=>{
     document.getElementById('landing').classList.add('show');
   }, 300);
@@ -782,7 +749,9 @@ document.getElementById('perm-btn').addEventListener('click', async()=>{
 /* ── STEP 2: Begin Journey button ── */
 document.getElementById('btn').addEventListener('click', ()=>{
 
-  /* Play music — audio already unlocked from step 1 */
+  /* Play music — audio context already unlocked from step 1 */
+  bgm.currentTime = 0;
+  bgm.play().catch(()=>{});
   fadeMusic();
 
   /* Fade out landing */
@@ -790,9 +759,8 @@ document.getElementById('btn').addEventListener('click', ()=>{
   land.classList.add('out');
   setTimeout(()=>{ land.style.display='none'; }, 800);
 
-  /* Show AR layer + music toggle */
+  /* Show AR layer */
   document.getElementById('ar-ui').classList.add('on');
-  musBtn.classList.add('on');
 
   /* Reveal all floating panels */
   document.querySelectorAll('.panel').forEach(p=>p.classList.add('on'));
