@@ -239,27 +239,32 @@
       text-shadow:0 1px 10px #000;
     }
 
-    /* ══════════════════════════════
-       PANELS
-       — fully transparent background
-       — text is readable via text-shadow
-       — positioned off-screen, gyro brings them in
-    ══════════════════════════════ */
+    /* panel hidden by default — starts below + invisible */
     .panel {
       position:fixed; z-index:300;
       width:175px;
-      opacity:0; pointer-events:none;
-      transition:opacity .5s ease;
-      will-change:transform;
+      opacity:0;
+      pointer-events:none;
+      transform: translateY(24px);
+      /* smooth transition for both opacity AND gyro transform */
+      transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, opacity;
     }
-    .panel.on { opacity:1; pointer-events:auto; }
 
-    /* anchor positions (base, before gyro offset) */
-    #pa { top:10%;  left:4%; }
-    #pr { top:10%;  right:4%; }
-    #pv { top:35%;  left:50%; margin-left:-87px; }
-    #pq { bottom:20%; left:4%; }
-    #pc { bottom:20%; right:4%; }
+    /* when .on is added — panel fades + rises into position */
+    .panel.on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* staggered delay per panel so they appear one by one */
+    #pa { top:10%;  left:4%;              transition-delay: 0s;   }
+    #pr { top:10%;  right:4%;             transition-delay: 0.3s; }
+    #pv { top:35%;  left:50%; margin-left:-87px; transition-delay: 0.6s; }
+    #pq { bottom:20%; left:4%;            transition-delay: 0.9s; }
+    #pc { bottom:20%; right:4%;           transition-delay: 1.2s; }
 
     /* panel inner — NO background, pure transparent */
     .pi {
@@ -366,29 +371,50 @@
       animation: up 1s ease .4s both;
     }
 
+    /* landing — smooth long fade out */
+    #landing {
+      position:fixed; inset:0; z-index:900;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:flex-start;
+      text-align:center; padding:0;
+      background: rgba(0,0,0,0.45);
+      /* slow, cinematic fade out */
+      transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 1.5s;
+      overflow:hidden;
+    }
+    #landing.out {
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    /* landing hidden by default, shown after permission */
     #landing { display:none; }
     #landing.show {
       display:flex;
-      animation: up .8s ease both;
-      /* transparent — camera video shows through from behind */
+      animation: fadeIn 1s ease both;
       background: transparent !important;
     }
 
-    /* float animations */
-    @keyframes fl1{0%,100%{margin-top:0}50%{margin-top:-7px}}
-    @keyframes fl2{0%,100%{margin-top:-4px}50%{margin-top:3px}}
-    @keyframes fl3{0%,100%{margin-top:0}50%{margin-top:6px}}
-    @keyframes fl4{0%,100%{margin-top:-3px}50%{margin-top:5px}}
-    @keyframes fl5{0%,100%{margin-top:2px}50%{margin-top:-5px}}
-    #pa.on .pi{animation:fl1 5s ease-in-out infinite;}
-    #pr.on .pi{animation:fl2 6s ease-in-out infinite;}
-    #pv.on .pi{animation:fl3 5.5s ease-in-out infinite;}
-    #pq.on .pi{animation:fl4 7s ease-in-out infinite;}
-    #pc.on .pi{animation:fl5 4.5s ease-in-out infinite;}
+    /* float animations — gentle, slow */
+    @keyframes fl1{0%,100%{transform:translateY(0px)}   50%{transform:translateY(-8px)}}
+    @keyframes fl2{0%,100%{transform:translateY(-5px)}  50%{transform:translateY(4px)}}
+    @keyframes fl3{0%,100%{transform:translateY(0px)}   50%{transform:translateY(7px)}}
+    @keyframes fl4{0%,100%{transform:translateY(-4px)}  50%{transform:translateY(5px)}}
+    @keyframes fl5{0%,100%{transform:translateY(3px)}   50%{transform:translateY(-6px)}}
 
-    @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-    @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+    /* apply float AFTER panel is fully visible */
+    #pa.on .pi { animation: fl1 6s ease-in-out 1.2s infinite; }
+    #pr.on .pi { animation: fl2 7s ease-in-out 1.5s infinite; }
+    #pv.on .pi { animation: fl3 6.5s ease-in-out 1.8s infinite; }
+    #pq.on .pi { animation: fl4 8s ease-in-out 2.1s infinite; }
+    #pc.on .pi { animation: fl5 5.5s ease-in-out 2.4s infinite; }
+
+    @keyframes up     { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes shimmer{ 0%{background-position:-200% center} 100%{background-position:200% center} }
+    @keyframes pulse  { 0%,100%{opacity:.4} 50%{opacity:1} }
   </style>
 </head>
 <body>
@@ -685,7 +711,10 @@ function applyGyro(g, b){
   const bF=Math.max(-1,Math.min(1,(b-90)/30));
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
-    if(el) el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
+    if(!el) return;
+    /* smooth gyro movement — override the entry transition with a faster one */
+    el.style.transition = 'opacity 1s ease, transform 0.3s ease-out';
+    el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
   });
 }
 
@@ -739,22 +768,22 @@ document.getElementById('btn').addEventListener('click', function(){
   /* START MUSIC — synchronous, first line, no awaits before this */
   startMusic();
 
-  /* Fade out landing */
+  /* Fade out landing — slow cinematic */
   const land = document.getElementById('landing');
   land.classList.add('out');
-  setTimeout(()=>{ land.style.display='none'; }, 800);
+  setTimeout(()=>{ land.style.display='none'; }, 1600);
 
   /* Show AR layer */
   document.getElementById('ar-ui').classList.add('on');
 
-  /* Reveal panels */
+  /* Reveal panels one by one (CSS stagger handles timing) */
   document.querySelectorAll('.panel').forEach(p => p.classList.add('on'));
 
-  /* Hide tilt hint after 5s */
-  setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 5000);
+  /* Start gyro AFTER all panels have appeared (1.2s + 0.9s longest delay + 1s transition) */
+  setTimeout(()=>{ initGyro(); }, 2400);
 
-  /* Gyro */
-  initGyro();
+  /* Hide tilt hint after 6s */
+  setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 6000);
 });
 </script>
 </body>
