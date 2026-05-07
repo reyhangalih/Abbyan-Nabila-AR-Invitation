@@ -582,58 +582,47 @@ musBtn.addEventListener('click',()=>{
 /* ── CAMERA ── */
 async function startCam(){
   try{
-    const s=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} },
+      audio:false
     });
-    document.getElementById('cam').srcObject=s;
-  }catch(e){console.warn('cam:',e);}
+    const vid = document.getElementById('cam');
+    vid.srcObject = stream;
+    /* wait for video to actually start playing before we fade landing */
+    return new Promise(resolve=>{
+      vid.oncanplay = ()=>{ vid.play(); resolve(); };
+      /* safety fallback — resolve after 1.5s even if oncanplay is slow */
+      setTimeout(resolve, 1500);
+    });
+  }catch(e){
+    console.warn('Camera unavailable:', e);
+    /* no camera → just resolve so flow continues */
+  }
 }
 
 /* ══════════════════════════════════════════
    GYRO PARALLAX
-   
-   Each panel has a "world anchor" — where it
-   lives in the virtual space around the user.
-   
-   anchorX = fraction of screen (-2 = 2 screens left, +2 = 2 screens right)
-   anchorY = fraction of screen (-2 = 2 screens up,   +2 = 2 screens down)
-   
-   Phone upright, looking forward → all panels off-screen
-   Tilt left  → Akad slides in from left
-   Tilt right → Resepsi slides in from right
-   Tilt up    → Venue slides in from top
-   Tilt down  → Quran/Countdown slide in from bottom
 ══════════════════════════════════════════ */
-
 const ANCHORS = {
-  pa: { ax: -0.7, ay:  0   },  // Akad:      LEFT (small tilt)
-  pr: { ax:  0.7, ay:  0   },  // Resepsi:   RIGHT
-  pv: { ax:  0,   ay: -0.7 },  // Venue:     UP
-  pq: { ax: -0.6, ay:  0.7 },  // Quran:     DOWN-LEFT
-  pc: { ax:  0.6, ay:  0.7 },  // Countdown: DOWN-RIGHT
+  pa: { ax: -0.7, ay:  0   },
+  pr: { ax:  0.7, ay:  0   },
+  pv: { ax:  0,   ay: -0.7 },
+  pq: { ax: -0.6, ay:  0.7 },
+  pc: { ax:  0.6, ay:  0.7 },
 };
 
-let smoothG=0, smoothB=90, gyroStarted=false;
+let smoothG=0, smoothB=90;
 
 function applyGyro(gamma, beta){
   const W=window.innerWidth, H=window.innerHeight;
-  /* 
-    gamma: device left-right tilt (-90…+90). 0=flat, neg=tilted left
-    beta:  device front-back tilt (0…180).   90=upright
-    
-    When upright (beta=90), betaDelta=0
-    Tilt forward (beta<90) = looking UP → panels that are "up" come into view
-    Tilt back (beta>90) = looking DOWN → panels that are "down" come into view
-  */
-  const gFactor = Math.max(-1, Math.min(1, gamma / 30));       // -1..1 left-right (30° max)
-  const bFactor = Math.max(-1, Math.min(1, (beta-90) / 30));   // -1..1 up-down
-
+  const gFactor = Math.max(-1, Math.min(1, gamma / 30));
+  const bFactor = Math.max(-1, Math.min(1, (beta-90) / 30));
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
     if(!el)return;
     const tx = (ax + gFactor * 0.7) * W * 0.5;
     const ty = (ay + bFactor * 0.7) * H * 0.5;
-    el.style.transform = `translate(${tx}px, ${ty}px)`;
+    el.style.transform=`translate(${tx}px,${ty}px)`;
   });
 }
 
@@ -641,12 +630,11 @@ function initGyro(){
   let hasGyro=false;
   window.addEventListener('deviceorientation', e=>{
     if(e.gamma===null && e.beta===null)return;
-    hasGyro=true; gyroStarted=true;
+    hasGyro=true;
     smoothG += (e.gamma - smoothG)*0.10;
     smoothB += (e.beta  - smoothB)*0.10;
     applyGyro(smoothG, smoothB);
   });
-  /* fallback: no gyro → lay all panels at their anchors (semi-visible) */
   setTimeout(()=>{
     if(!hasGyro){
       Object.keys(ANCHORS).forEach(id=>{
@@ -657,37 +645,37 @@ function initGyro(){
   },2500);
 }
 
-/* ── START CAMERA ON PAGE LOAD (before button click) ── */
-startCam();
-
 /* ── START BUTTON ── */
 document.getElementById('btn').addEventListener('click', async()=>{
-  /* iOS gyro permission (must happen on user gesture) */
+
+  /* 1. iOS gyro permission — must be on user gesture */
   if(typeof DeviceOrientationEvent!=='undefined' &&
      typeof DeviceOrientationEvent.requestPermission==='function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
 
-  /* IMMEDIATELY remove landing — display:none, no delay */
-  const land=document.getElementById('landing');
-  land.classList.add('out');
-  /* after transition done, fully remove from layout */
-  setTimeout(()=>land.style.display='none', 750);
+  /* 2. Start camera and WAIT for stream to be ready */
+  await startCam();
 
-  /* show AR layer */
+  /* 3. NOW fade out landing — camera is already running behind it */
+  const land = document.getElementById('landing');
+  land.classList.add('out');
+  setTimeout(()=>{ land.style.display='none'; }, 800);
+
+  /* 4. Show AR layer + music toggle */
   document.getElementById('ar-ui').classList.add('on');
   musBtn.classList.add('on');
 
-  /* make panels visible */
+  /* 5. Reveal all panels */
   document.querySelectorAll('.panel').forEach(p=>p.classList.add('on'));
 
-  /* hide hint after 5s */
-  setTimeout(()=>document.getElementById('hint').classList.add('gone'),5000);
+  /* 6. Hide tilt hint after 5s */
+  setTimeout(()=>document.getElementById('hint').classList.add('gone'), 5000);
 
-  /* music */
+  /* 7. Fade in music */
   fadeIn();
 
-  /* init gyro parallax */
+  /* 8. Start gyro */
   initGyro();
 });
 </script>
