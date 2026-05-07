@@ -98,20 +98,22 @@
         transparent 30%, rgba(0,0,0,.6) 100%);
     }
 
+    /* Begin The Journey button wrapper */
+    #btn-wrap {
+      position:absolute; bottom:7%; left:0; right:0;
+      z-index:12;
+      display:flex; justify-content:center; align-items:center;
+    }
     /* Begin The Journey button */
     #btn {
-      position:absolute; bottom:7%;
-      left:50%; transform:translateX(-50%);
-      z-index:12;
       display:inline-flex; align-items:center; gap:.8rem;
       background:transparent; border:2px solid var(--blue);
       border-radius:999px; color:var(--blue);
       font-family:'Jost',sans-serif;
-      font-size:.85rem;
-      font-weight:300; letter-spacing:.12em;
+      font-size:.85rem; font-weight:300; letter-spacing:.12em;
       padding:.75rem 1.5rem .75rem 2rem;
       cursor:pointer; transition:all .35s;
-      white-space:nowrap; width:max-content;
+      white-space:nowrap;
       opacity:0; animation:fadeUp 1s ease 1s forwards;
       -webkit-tap-highlight-color:transparent;
     }
@@ -267,12 +269,14 @@
   />
 
   <!-- Begin The Journey button -->
-  <button id="btn">
-    Begin The Journey
-    <span class="btn-play">
-      <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
-    </span>
-  </button>
+  <div id="btn-wrap">
+    <button id="btn">
+      Begin The Journey
+      <span class="btn-play">
+        <svg viewBox="0 0 12 12"><polygon points="3,1 11,6 3,11"/></svg>
+      </span>
+    </button>
+  </div>
 
 </div>
 
