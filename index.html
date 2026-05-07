@@ -650,17 +650,35 @@ function tick(){
 setInterval(tick,1000); tick();
 
 /* ── MUSIC ── */
-const bgm=document.getElementById('bgm');
-const musBtn=document.getElementById('mus');
-bgm.volume=0;
-function fadeMusic(){
-  bgm.play().catch(()=>{});
-  let v=0;
-  const iv=setInterval(()=>{v=Math.min(v+0.02,.5);bgm.volume=v;if(v>=.5)clearInterval(iv);},80);
+const bgm = document.getElementById('bgm');
+const musBtn = document.getElementById('mus');
+bgm.volume = 0;
+let audioUnlocked = false;
+
+/* Unlock audio context on first user gesture (iOS requirement) */
+function unlockAudio(){
+  if(audioUnlocked) return;
+  bgm.play().then(()=>{
+    bgm.pause();
+    bgm.currentTime = 0;
+    audioUnlocked = true;
+  }).catch(()=>{});
 }
-musBtn.addEventListener('click',()=>{
-  if(bgm.paused){bgm.play();musBtn.textContent='♪';musBtn.classList.remove('off');}
-  else{bgm.pause();musBtn.textContent='♩';musBtn.classList.add('off');}
+
+function fadeMusic(){
+  bgm.volume = 0;
+  bgm.play().catch(()=>{});
+  let v = 0;
+  const iv = setInterval(()=>{
+    v = Math.min(v + 0.02, 0.5);
+    bgm.volume = v;
+    if(v >= 0.5) clearInterval(iv);
+  }, 80);
+}
+
+musBtn.addEventListener('click', ()=>{
+  if(bgm.paused){ bgm.play(); musBtn.textContent='♪'; musBtn.classList.remove('off'); }
+  else { bgm.pause(); musBtn.textContent='♩'; musBtn.classList.add('off'); }
 });
 
 /* ── CAMERA ── */
@@ -738,6 +756,9 @@ function initGyro(){
 /* ── STEP 1: Permission button ── */
 document.getElementById('perm-btn').addEventListener('click', async()=>{
 
+  /* Unlock audio immediately on first user gesture — iOS requirement */
+  unlockAudio();
+
   /* iOS 13+ requires explicit DeviceOrientation permission on user gesture */
   if(typeof DeviceOrientationEvent!=='undefined'&&
      typeof DeviceOrientationEvent.requestPermission==='function'){
@@ -745,7 +766,7 @@ document.getElementById('perm-btn').addEventListener('click', async()=>{
   }
 
   /* Start camera — this triggers the browser permission dialog */
-  const camOk = await startCam();
+  await startCam();
 
   /* Fade out permission screen */
   const perm = document.getElementById('perm-screen');
@@ -761,6 +782,9 @@ document.getElementById('perm-btn').addEventListener('click', async()=>{
 /* ── STEP 2: Begin Journey button ── */
 document.getElementById('btn').addEventListener('click', ()=>{
 
+  /* Play music — audio already unlocked from step 1 */
+  fadeMusic();
+
   /* Fade out landing */
   const land = document.getElementById('landing');
   land.classList.add('out');
@@ -775,9 +799,6 @@ document.getElementById('btn').addEventListener('click', ()=>{
 
   /* Hide tilt hint after 5s */
   setTimeout(()=>document.getElementById('hint').classList.add('gone'), 5000);
-
-  /* Fade in music */
-  fadeMusic();
 
   /* Start gyro parallax */
   initGyro();
