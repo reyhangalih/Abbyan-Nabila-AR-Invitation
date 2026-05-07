@@ -625,53 +625,51 @@
 const WED = new Date('2026-06-14T08:00:00+07:00');
 function tick(){
   const d = WED - Date.now();
-  if(d<=0){['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent='00');return;}
-  const pad=n=>String(n).padStart(2,'0');
-  document.getElementById('cd-d').textContent=pad(Math.floor(d/864e5));
-  document.getElementById('cd-h').textContent=pad(Math.floor(d%864e5/36e5));
-  document.getElementById('cd-m').textContent=pad(Math.floor(d%36e5/6e4));
-  document.getElementById('cd-s').textContent=pad(Math.floor(d%6e4/1e3));
+  if(d <= 0){ ['d','h','m','s'].forEach(k => document.getElementById('cd-'+k).textContent='00'); return; }
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('cd-d').textContent = pad(Math.floor(d/864e5));
+  document.getElementById('cd-h').textContent = pad(Math.floor(d%864e5/36e5));
+  document.getElementById('cd-m').textContent = pad(Math.floor(d%36e5/6e4));
+  document.getElementById('cd-s').textContent = pad(Math.floor(d%6e4/1e3));
 }
-setInterval(tick,1000); tick();
+setInterval(tick, 1000); tick();
 
 /* ── MUSIC ── */
 const bgm = document.getElementById('bgm');
-bgm.volume = 0;
 
-function fadeMusic(){
-  /* volume fade in */
-  let v = 0;
-  const iv = setInterval(()=>{
-    v = Math.min(v + 0.015, 0.5);
-    bgm.volume = v;
-    if(v >= 0.5) clearInterval(iv);
-  }, 100);
+function startMusic(){
+  bgm.volume = 0;
+  bgm.currentTime = 0;
+  const p = bgm.play();
+  if(p !== undefined){
+    p.then(()=>{
+      /* fade volume up */
+      let v = 0;
+      const iv = setInterval(()=>{
+        v = Math.min(v + 0.02, 0.5);
+        bgm.volume = v;
+        if(v >= 0.5) clearInterval(iv);
+      }, 100);
+    }).catch(e => console.warn('audio:', e));
+  }
 }
 
 /* ── CAMERA ── */
 async function startCam(){
-  const vid = document.getElementById('cam');
   try{
     const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} },
-      audio:false
+      video:{ facingMode:{ideal:'environment'} }, audio:false
     });
+    const vid = document.getElementById('cam');
     vid.srcObject = stream;
-    /* wait for actual playback before resolving */
-    await new Promise(resolve=>{
+    await new Promise(resolve =>{
       vid.oncanplay = ()=>{ vid.play(); resolve(); };
-      setTimeout(resolve, 1500); /* safety timeout */
+      setTimeout(resolve, 1500);
     });
-    return true;
-  }catch(e){
-    console.warn('Camera unavailable:', e);
-    return false;
-  }
+  }catch(e){ console.warn('cam:', e); }
 }
 
-/* ══════════════════════════════
-   GYRO PARALLAX
-══════════════════════════════ */
+/* ── GYRO ── */
 const ANCHORS = {
   pa:{ ax:-0.7, ay: 0   },
   pr:{ ax: 0.7, ay: 0   },
@@ -679,56 +677,43 @@ const ANCHORS = {
   pq:{ ax:-0.6, ay: 0.7 },
   pc:{ ax: 0.6, ay: 0.7 },
 };
-let smoothG=0, smoothB=90;
+let sG=0, sB=90;
 
-function applyGyro(gamma, beta){
+function applyGyro(g, b){
   const W=window.innerWidth, H=window.innerHeight;
-  const gF=Math.max(-1,Math.min(1,gamma/30));
-  const bF=Math.max(-1,Math.min(1,(beta-90)/30));
+  const gF=Math.max(-1,Math.min(1,g/30));
+  const bF=Math.max(-1,Math.min(1,(b-90)/30));
   Object.entries(ANCHORS).forEach(([id,{ax,ay}])=>{
     const el=document.getElementById(id);
-    if(!el)return;
-    el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
+    if(el) el.style.transform=`translate(${(ax+gF*0.7)*W*0.5}px,${(ay+bF*0.7)*H*0.5}px)`;
   });
 }
 
 function initGyro(){
   let hasGyro=false;
-  window.addEventListener('deviceorientation',e=>{
-    if(e.gamma===null&&e.beta===null)return;
+  window.addEventListener('deviceorientation', e=>{
+    if(e.gamma===null && e.beta===null) return;
     hasGyro=true;
-    smoothG+=(e.gamma-smoothG)*0.10;
-    smoothB+=(e.beta-smoothB)*0.10;
-    applyGyro(smoothG,smoothB);
+    sG += (e.gamma-sG)*0.1;
+    sB += (e.beta-sB)*0.1;
+    applyGyro(sG, sB);
   });
   setTimeout(()=>{
     if(!hasGyro) Object.keys(ANCHORS).forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.style.transform='translate(0,0)';
     });
-  },2500);
+  }, 2500);
 }
 
-/* ══════════════════════════════════════════════════
-   FLOW:
-   1. User taps "Allow Camera Access" on perm screen
-   2. Camera permission dialog → user allows
-   3. Camera starts streaming (video el gets srcObject)
-   4. Perm screen fades out
-   5. Landing appears — camera already live behind it
-   6. User taps "Begin The Journey"
-   7. Landing fades out → full AR experience
-══════════════════════════════════════════════════ */
+/* ══════════════════════════════
+   STEP 1 — Permission screen
+══════════════════════════════ */
+document.getElementById('perm-btn').addEventListener('click', async function(){
 
-/* ── STEP 1: Permission button ── */
-document.getElementById('perm-btn').addEventListener('click', async()=>{
-
-  /* Play + immediately pause to unlock audio context on iOS — must be first synchronous action */
-  bgm.play().then(()=>{ bgm.pause(); bgm.currentTime = 0; }).catch(()=>{});
-
-  /* iOS DeviceOrientation permission */
-  if(typeof DeviceOrientationEvent!=='undefined' &&
-     typeof DeviceOrientationEvent.requestPermission==='function'){
+  /* iOS gyro permission — must be synchronous on gesture */
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
     try{ await DeviceOrientationEvent.requestPermission(); }catch(e){}
   }
 
@@ -740,19 +725,19 @@ document.getElementById('perm-btn').addEventListener('click', async()=>{
   perm.classList.add('out');
   setTimeout(()=>{ perm.style.display='none'; }, 700);
 
-  /* Show landing over live camera */
+  /* Show landing (camera already live behind) */
   setTimeout(()=>{
     document.getElementById('landing').classList.add('show');
-  }, 300);
+  }, 350);
 });
 
-/* ── STEP 2: Begin Journey button ── */
-document.getElementById('btn').addEventListener('click', ()=>{
+/* ══════════════════════════════
+   STEP 2 — Begin Journey
+══════════════════════════════ */
+document.getElementById('btn').addEventListener('click', function(){
 
-  /* Play music — audio context already unlocked from step 1 */
-  bgm.currentTime = 0;
-  bgm.play().catch(()=>{});
-  fadeMusic();
+  /* START MUSIC — synchronous, first line, no awaits before this */
+  startMusic();
 
   /* Fade out landing */
   const land = document.getElementById('landing');
@@ -762,13 +747,13 @@ document.getElementById('btn').addEventListener('click', ()=>{
   /* Show AR layer */
   document.getElementById('ar-ui').classList.add('on');
 
-  /* Reveal all floating panels */
-  document.querySelectorAll('.panel').forEach(p=>p.classList.add('on'));
+  /* Reveal panels */
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('on'));
 
   /* Hide tilt hint after 5s */
-  setTimeout(()=>document.getElementById('hint').classList.add('gone'), 5000);
+  setTimeout(()=>{ document.getElementById('hint').classList.add('gone'); }, 5000);
 
-  /* Start gyro parallax */
+  /* Gyro */
   initGyro();
 });
 </script>
